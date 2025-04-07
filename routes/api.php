@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use app\Http\Controllers\API\GameController;
+use app\Http\Controllers\API\GameListController;
 
 Route::get('/lists', function () {
     return response()->json([
@@ -35,4 +37,9 @@ Route::get('/friends', function () {
         ['name' => 'JaniraLaPrimera'],
         ['name' => 'Jagger'],
     ]);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('lists', GameListController::class);
+    Route::apiResource('games', GameController::class);
 });
