@@ -2,15 +2,23 @@
 
 @section('content')
 <div class="container">
-    <h2>Les meves llistes</h2>
-    <div id="lists-container" class="lists-grid"></div>
+    <section class="dashboard-header">
+        <h2>📂 Les meves llistes</h2>
+        <button onclick="showNewListForm()" class="btn-create-list">➕ Nova Llista</button>
+    </section>
 
-    <button onclick="showNewListForm()">➕ Nova Llista</button>
+    <section id="new-list-form" style="display: none;" class="new-list-form">
+        <input
+            type="text"
+            id="newListName"
+            placeholder="Nom de la llista"
+            class="input-list-name">
+        <button onclick="createList()" class="btn-confirm-create">Crear</button>
+    </section>
 
-    <div id="new-list-form" style="display:none;">
-        <input type="text" id="newListName" placeholder="Nom de la llista">
-        <button onclick="createList()">Crear</button>
-    </div>
+    <section id="lists-container" class="lists-grid mt-6">
+        {{-- Les llistes es carregaran aquí via JS --}}
+    </section>
 </div>
 
 <script src="{{ asset('js/dashboard.js') }}"></script>
