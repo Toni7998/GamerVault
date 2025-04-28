@@ -24,26 +24,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Rutas de autenticación de Google
-Route::get('/google-auth/redirect', function () {
-    return Socialite::driver('google')->redirect();
-});
-
-Route::get('/google-auth/callback', function () {
-    $user_google = Socialite::driver('google')->stateless()->user();
-
-    $user = User::updateOrCreate([
-        'email' => $user_google->email,
-    ], [
-        'name' => $user_google->name,
-        'email' => $user_google->email,
-    ]);
-
-    Auth::login($user, true);
-
-    return redirect('/dashboard');
-});
-
 // Ruta del dashboard (usando la Opción 1, pasando el usuario directamente desde la ruta)
 Route::get('/dashboard', function () {
     return view('llistes');
