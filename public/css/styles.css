@@ -133,7 +133,8 @@ button {
 }
 
 .link-button:hover {
-    color: #60a5fa; /* mismo hover azul clarito */
+    color: #60a5fa;
+    /* mismo hover azul clarito */
 }
 
 
@@ -178,3 +179,165 @@ button {
     color: #f0f0f0;
 }
 
+/* Estilo de los elementos del ranking */
+#ranking-list li {
+    background: #1e1e1e;
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    /* Espacio entre los juegos */
+    transition: transform 0.3s ease-in-out;
+}
+
+#ranking-list li:hover {
+    transform: translateY(-5px);
+    /* Sutil efecto de hover */
+}
+
+#ranking-list img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+#ranking-list h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+#ranking-list p {
+    margin: 0.2rem 0;
+    font-size: 0.875rem;
+    color: #ccc;
+}
+
+#ranking-list a {
+    margin-top: 0.4rem;
+    display: inline-block;
+    color: #00bcd4;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+
+#ranking-list a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para mayor adaptabilidad */
+@media (max-width: 600px) {
+    #ranking-list li {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    #ranking-list img {
+        width: 100%;
+        height: auto;
+        margin-bottom: 1rem;
+        /* Espacio debajo de las imágenes en móviles */
+    }
+}
+
+/* Estilo de los elementos de las recomendaciones */
+#recommendations-list li {
+    background: #1e1e1e;
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    /* Espacio entre los juegos */
+    transition: transform 0.3s ease-in-out;
+}
+
+#recommendations-list li:hover {
+    transform: translateY(-5px);
+    /* Sutil efecto de hover */
+}
+
+#recommendations-list img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+#recommendations-list h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+#recommendations-list p {
+    margin: 0.2rem 0;
+    font-size: 0.875rem;
+    color: #ccc;
+}
+
+#recommendations-list a {
+    margin-top: 0.4rem;
+    display: inline-block;
+    color: #00bcd4;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+
+#recommendations-list a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para mayor adaptabilidad */
+@media (max-width: 600px) {
+    #recommendations-list li {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    #recommendations-list img {
+        width: 100%;
+        height: auto;
+        margin-bottom: 1rem;
+        /* Espacio debajo de las imágenes en móviles */
+    }
+}
+
+/* Estilo adicional para la cabecera de las recomendaciones */
+#recommendations-list h2 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Aseguramos que las imágenes tengan un tamaño adecuado para las recomendaciones */
+#recommendations-list img {
+    max-width: 120px;
+    max-height: 80px;
+}
+
+/* Personalización del contenedor para recomendaciones */
+.container {
+    padding: 2rem;
+    margin: auto;
+}
+
+.container ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 2rem;
+}

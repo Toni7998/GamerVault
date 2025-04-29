@@ -1,13 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\ShoppingListController;
-use App\Http\Controllers\FirebaseController;
+use Illuminate\Support\Facades\Http;
+
 /*
 |---------------------------------------------------------------------------
 | Web Routes
@@ -73,6 +72,65 @@ Route::view('/friends', 'pages.friends')->middleware(['auth'])->name('friends');
 Route::view('/recomanacions', 'pages.recomanacions')->middleware(['auth'])->name('recomanacions');
 Route::view('/ranking', 'pages.ranking')->middleware(['auth'])->name('ranking');
 
+
+Route::get('/api/ranking', function () {
+    $response = Http::get('https://api.rawg.io/api/games', [
+        'key' => 'a6932e9255e64cf98bfa75abde510c5d',
+        'ordering' => '-rating',
+        'page_size' => 5,
+    ]);
+
+    $games = $response->json()['results'];
+
+    return response()->json($games);
+});
+
+Route::get('/api/recommendations', function () {
+    $day = now()->dayOfWeek;
+
+    // Criteris d’ordenació diferents segons el dia
+    $orderingOptions = [
+        '-rating',      // Diumenge
+        '-added',       // Dilluns
+        '-released',    // Dimarts
+        '-updated',     // Dimecres
+        'name',         // Dijous
+        '-metacritic',  // Divendres
+        'released'      // Dissabte
+    ];
+
+    // Noms bonics en català segons el dia
+    $dayNames = [
+        '✨ Diumenges de clàssics',
+        '🚀 Dilluns futuristes',
+        '🔫 Dimarts d\'acció',
+        '🧠 Dimecres estratègics',
+        '🎨 Dijous creatius',
+        '🏆 Divendres top',
+        '🎮 Dissabtes d\'aventures'
+    ];
+
+    $ordering = $orderingOptions[$day];
+    $sender = $dayNames[$day];
+
+    $response = Http::get('https://api.rawg.io/api/games', [
+        'key' => 'a6932e9255e64cf98bfa75abde510c5d',
+        'ordering' => $ordering,
+        'page_size' => 3,
+    ]);
+
+    $games = $response->json()['results'] ?? [];
+
+    $recommendations = [];
+    foreach ($games as $game) {
+        $recommendations[] = [
+            'sender' => $sender,
+            'game' => $game['name'],
+        ];
+    }
+
+    return response()->json($recommendations);
+});
 
 // Cargar rutas adicionales de autenticación
 require __DIR__ . '/auth.php';

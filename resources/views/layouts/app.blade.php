@@ -18,7 +18,7 @@
             <li><a href="{{ route('dashboard') }}" class="nav-link">Llistes</a></li>
             <li><a href="{{ route('friends') }}" class="nav-link">Amics</a></li>
             <li><a href="{{ route('recomanacions') }}" class="nav-link">Recomanacions</a></li>
-            <li><a href="{{ route('ranking') }}" class="nav-link">Pòdium</a></li>
+            <li><a href="{{ route('ranking') }}" class="nav-link">Ranking</a></li>
             <li>
                 <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                     @csrf
