@@ -58,6 +58,17 @@ body::-webkit-scrollbar-track {
     color: #00bcd4;
 }
 
+/* Contenedor interno de la navbar */
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
 /* Container principal */
 .container {
     padding: 2rem;
@@ -340,4 +351,104 @@ button {
     list-style: none;
     padding-left: 0;
     margin-top: 2rem;
+}
+
+/* Centrado general del contenido y limitación del ancho */
+.container {
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2rem;
+}
+
+/* Alineación de la navbar centrada y consistente */
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.navbar>h1 {
+    margin-right: auto;
+}
+
+/* Si prefieres que la navbar esté más ajustada como un contenedor */
+.navbar-inner {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Barra de bienvenida igual a la de la navbar */
+.welcome-bar {
+    background-color: #1f1f1f;  /* Misma que la navbar */
+    color: #fff;  /* Texto blanco */
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    position: sticky;
+    top: 0;
+    z-index: 9;
+}
+
+input,
+select,
+textarea {
+    background-color: #2a2a2a;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #00bcd4;
+    box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.3);
+}
+
+.card-sm {
+    background-color: #1e1e1e;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.tag {
+    display: inline-block;
+    background-color: #00bcd4;
+    color: #121212;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.scale-on-hover:hover {
+    transform: scale(1.03);
+}
+
+.fade-hover:hover {
+    opacity: 0.8;
+}
+
+footer {
+    background-color: #1f1f1f;
+    color: #ccc;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 3rem;
+    font-size: 0.875rem;
 }

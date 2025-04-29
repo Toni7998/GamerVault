@@ -6,6 +6,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\ContactController;
 
 /*
 |---------------------------------------------------------------------------
@@ -131,6 +132,9 @@ Route::get('/api/recommendations', function () {
 
     return response()->json($recommendations);
 });
+
+Route::get('/contacte', [ContactController::class, 'create'])->name('contacte');
+Route::post('/contacte', [ContactController::class, 'store']);
 
 // Cargar rutas adicionales de autenticación
 require __DIR__ . '/auth.php';
