@@ -14,15 +14,21 @@
             <input type="text" id="name" name="name" class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Escriu el teu nom" required>
         </div>
 
+        <br>
+
         <div class="mb-5 text-left">
             <label for="email" class="block text-lg mb-2">📧 Correu electrònic:</label>
             <input type="email" id="email" name="email" class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="exemple@correu.com" required>
         </div>
 
+        <br>
+
         <div class="mb-6 text-left">
             <label for="message" class="block text-lg mb-2">💬 Missatge:</label>
             <textarea id="message" name="message" rows="5" class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Escriu el teu missatge aquí..." required></textarea>
         </div>
+
+        <br>
 
         <button type="submit" class="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:scale-105">
             ✉️ Enviar missatge
