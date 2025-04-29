@@ -25,7 +25,7 @@ class ContactController extends Controller
         ]);
 
         // Enviar el correo
-        Mail::to('contacte@gamervault.com')->send(new ContactMessage(
+        Mail::to('antonio.ruiz@insbaixcamp.cat')->send(new ContactMessage(
             $validatedData['name'],
             $validatedData['email'],
             $validatedData['message']

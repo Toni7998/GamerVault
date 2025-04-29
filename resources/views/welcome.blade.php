@@ -91,7 +91,7 @@
         <section id="contacte" class="fade-in" style="margin-top: 5rem; text-align: center;">
             <h2 class="text-3xl font-bold mb-4">📩 Contacta amb nosaltres</h2>
             <p class="mb-6">Tens preguntes, suggeriments o simplement vols dir hola? Envia'ns un correu!</p>
-            <a href="mailto:contacte@gamervault.com">
+            <a href="mailto:antonio.ruiz@insbaixcamp.cat">
                 <button>📬 Contactar</button>
             </a>
         </section>
