@@ -21,7 +21,7 @@
                 <li><a href="{{ route('friends') }}" class="nav-link text-lg hover:text-yellow-400">👯 Amics</a></li>
                 <li><a href="{{ route('recomanacions') }}" class="nav-link text-lg hover:text-yellow-400">🔎 Recomanacions</a></li>
                 <li><a href="{{ route('ranking') }}" class="nav-link text-lg hover:text-yellow-400">🏆 Ranking</a></li>
-                <li><a href="#contacte" class="nav-link text-lg hover:text-yellow-400">📩 Contacte</a></li>
+                <li><a href="{{ route('contacte') }}" class="nav-link text-lg hover:text-yellow-400">📩 Contacte</a></li>
                 <li>
                     <form method="POST" action="{{ route('logout') }}" class="inline-form">
                         @csrf
