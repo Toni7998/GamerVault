@@ -1,55 +1,54 @@
-document.addEventListener("DOMContentLoaded", loadLists);
+document.addEventListener('DOMContentLoaded', function () {
+    fetchUserGameList();
+});
 
-function loadLists() {
-    fetch("/api/lists")
-        .then(res => res.json())
-        .then(data => {
-            const container = document.getElementById("lists-container");
-            container.innerHTML = '';
-
-            if (data.length === 0) {
-                container.innerHTML = "<p class='text-gray-600'>No tens cap llista creada encara. 🗂️</p>";
-                return;
-            }
-
-            data.forEach(list => {
-                const el = document.createElement("div");
-                el.classList.add("list-card", "p-4", "border", "rounded", "shadow", "hover:shadow-lg", "transition", "bg-white");
-                el.innerHTML = `<h3 class="font-semibold text-lg">${list.name}</h3>`;
-                container.appendChild(el);
-            });
-        })
-        .catch(error => {
-            console.error("Error carregant les llistes:", error);
-        });
-}
-
-function showNewListForm() {
-    document.getElementById("new-list-form").classList.toggle('hidden');
-}
-
-function createList() {
-    const name = document.getElementById("newListName").value.trim();
-    if (!name) return;
-
-    fetch("/api/lists", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({ name })
-    })
+function fetchUserGameList() {
+    fetch('/game-list') // corregido aquí
         .then(response => {
-            if (!response.ok) throw new Error("Error creant la llista.");
+            if (!response.ok) {
+                throw new Error('Error carregant la llista');
+            }
             return response.json();
         })
-        .then(() => {
-            loadLists();
-            document.getElementById("newListName").value = '';
-            document.getElementById("new-list-form").classList.add('hidden');
+        .then(data => {
+            renderGameList(data);
         })
         .catch(error => {
-            console.error("Error creant la llista:", error);
+            console.error(error);
+            const container = document.getElementById("lists-container");
+            container.innerHTML = "<p class='text-red-500 text-center col-span-4'>No s'ha pogut carregar la llista. 😢</p>";
         });
+}
+
+function renderGameList(data) {
+    const container = document.getElementById("lists-container");
+    container.innerHTML = ''; // Limpiar
+
+    if (!data || Object.keys(data).length === 0) {
+        container.innerHTML = "<p class='text-gray-600 text-center col-span-4'>No tens cap llista encara. 🗂️</p>";
+        return;
+    }
+
+    const el = document.createElement("div");
+    el.classList.add(
+        "list-card",
+        "p-6",
+        "bg-white",
+        "border",
+        "border-gray-200",
+        "rounded-lg",
+        "shadow-md",
+        "hover:shadow-lg",
+        "transition-all"
+    );
+
+    el.innerHTML = `
+        <h3 class="font-semibold text-lg text-gray-800">${data.name}</h3>
+        <p class="text-sm text-gray-500 mt-2">Jocs afegits: ${data.games.length}</p>
+        <button onclick="deleteList(${data.id})" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-200 mt-4">
+            Eliminar
+        </button>
+    `;
+
+    container.appendChild(el);
 }

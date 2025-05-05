@@ -2,27 +2,20 @@
 
 @section('content')
 <div class="container mx-auto p-6">
-    <section class="dashboard-header flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">📂 Les meves llistes</h2>
-        <button onclick="showNewListForm()" class="btn-create-list">➕ Nova Llista</button>
+    <section class="dashboard-header mb-6">
+        <h2 class="text-3xl font-semibold text-gray-800">📂 La meva llista</h2>
+        <p class="text-gray-600 mt-2">Aquesta és la teva única llista personal de videojocs. 🎮</p>
     </section>
 
-    <section id="new-list-form" class="new-list-form mb-6 hidden">
-        <div class="flex space-x-2">
-            <input
-                type="text"
-                id="newListName"
-                placeholder="Nom de la llista"
-                class="input-list-name flex-1 border rounded p-2">
-            <button onclick="createList()" class="btn-confirm-create bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                Crear
-            </button>
-        </div>
+    <!-- Contenedor donde se cargará la lista -->
+    <section id="lists-container" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {{-- La llista es carregarà aquí via JS --}}
     </section>
 
-    <section id="lists-container" class="lists-grid grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {{-- Les llistes es carregaran aquí via JS --}}
-    </section>
+    <!-- Notificació (opcional, si vols mostrar missatges) -->
+    <div id="notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-md">
+        <p id="notification-message"></p>
+    </div>
 </div>
 
 <script src="{{ asset('js/llistes.js') }}"></script>

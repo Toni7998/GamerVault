@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Api\GameListController;
 
 /*
 |---------------------------------------------------------------------------
@@ -78,7 +79,7 @@ Route::get('/api/ranking', function () {
     $response = Http::get('https://api.rawg.io/api/games', [
         'key' => 'a6932e9255e64cf98bfa75abde510c5d',
         'ordering' => '-rating',
-        'page_size' => 5,
+        'page_size' => 10,
     ]);
 
     $games = $response->json()['results'];
@@ -117,7 +118,7 @@ Route::get('/api/recommendations', function () {
     $response = Http::get('https://api.rawg.io/api/games', [
         'key' => 'a6932e9255e64cf98bfa75abde510c5d',
         'ordering' => $ordering,
-        'page_size' => 3,
+        'page_size' => 5,
     ]);
 
     $games = $response->json()['results'] ?? [];
@@ -135,6 +136,15 @@ Route::get('/api/recommendations', function () {
 
 Route::get('/contacte', [ContactController::class, 'create'])->name('contacte');
 Route::post('/contacte', [ContactController::class, 'store']);
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/game-list', [GameListController::class, 'index']);
+    Route::post('/game-list', [GameListController::class, 'addGame']);
+    Route::delete('/game-list/{id}', [GameListController::class, 'removeGame']);
+});
+
+
 
 // Cargar rutas adicionales de autenticación
 require __DIR__ . '/auth.php';
