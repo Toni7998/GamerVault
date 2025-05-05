@@ -20,6 +20,6 @@ class GameList extends Model
 
     public function games()
     {
-        return $this->hasMany(Game::class); // o como se llame tu modelo de juegos
+        return $this->hasMany(Game::class);
     }
 }

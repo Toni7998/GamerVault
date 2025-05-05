@@ -7,6 +7,19 @@
         <p class="text-gray-600 mt-2">Aquesta és la teva única llista personal de videojocs. 🎮</p>
     </section>
 
+    <!-- Barra de búsqueda -->
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Buscar..." class="search-input">
+        <button id="search-btn" class="search-btn">🔍</button>
+    </div>
+
+    <!-- Resultats de la cerca -->
+    <div id="search-results" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        <!-- Els resultats de la cerca es mostraran aquí -->
+    </div>
+
+    <br>
+
     <!-- Contenedor donde se cargará la lista -->
     <section id="lists-container" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {{-- La llista es carregarà aquí via JS --}}

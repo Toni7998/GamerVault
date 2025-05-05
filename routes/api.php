@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GameSearchController;
 
 Route::get('/lists', function () {
     return response()->json([
@@ -30,3 +31,4 @@ Route::get('/friends', function () {
     ]);
 });
 
+Route::get('/search-games', [GameSearchController::class, 'search']);

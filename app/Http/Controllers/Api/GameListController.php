@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\GameList;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class GameListController extends Controller
 {
@@ -64,4 +65,5 @@ class GameListController extends Controller
 
         return response()->json(['message' => 'Joc eliminat correctament']);
     }
+
 }

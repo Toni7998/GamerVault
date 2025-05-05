@@ -384,8 +384,10 @@ button {
 
 /* Barra de bienvenida igual a la de la navbar */
 .welcome-bar {
-    background-color: #1f1f1f;  /* Misma que la navbar */
-    color: #fff;  /* Texto blanco */
+    background-color: #1f1f1f;
+    /* Misma que la navbar */
+    color: #fff;
+    /* Texto blanco */
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
@@ -451,4 +453,76 @@ footer {
     padding: 1rem;
     margin-top: 3rem;
     font-size: 0.875rem;
+}
+
+/* Estilos de la barra de búsqueda */
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.search-input {
+    background-color: #2a2a2a;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    width: 250px;
+    margin-right: 0.5rem;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #00bcd4;
+    box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.3);
+}
+
+.search-btn {
+    background-color: #00bcd4;
+    color: #121212;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background-color: #60a5fa;
+}
+
+.results-container {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Asegurarse de que los resultados se vean bien en móviles */
+@media (max-width: 600px) {
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-input {
+        width: 100%;
+        margin-right: 0;
+    }
+}
+
+#search-results .card {
+    background-color: #2a2a2a;
+    color: #f0f0f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+#search-results .card:hover {
+    transform: translateY(-4px);
 }

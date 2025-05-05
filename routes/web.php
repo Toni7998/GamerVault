@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Api\GameListController;
+use App\Http\Controllers\GameSearchController;
+
 
 /*
 |---------------------------------------------------------------------------
@@ -70,11 +72,14 @@ Route::get('auth/github/callback', function () {
     return redirect('/dashboard');
 });
 
+
+// 🔒 Rutas que muestran vistas protegidas por login (solo accedibles si el usuario ha iniciado sesión)
 Route::view('/friends', 'pages.friends')->middleware(['auth'])->name('friends');
 Route::view('/recomanacions', 'pages.recomanacions')->middleware(['auth'])->name('recomanacions');
 Route::view('/ranking', 'pages.ranking')->middleware(['auth'])->name('ranking');
 
 
+// 🧠 Ruta API que devuelve los 20 juegos mejor valorados desde RAWG
 Route::get('/api/ranking', function () {
     $response = Http::get('https://api.rawg.io/api/games', [
         'key' => 'a6932e9255e64cf98bfa75abde510c5d',
@@ -87,6 +92,8 @@ Route::get('/api/ranking', function () {
     return response()->json($games);
 });
 
+
+// 🎲 Ruta API que genera recomendaciones dinámicas según el día de la semana
 Route::get('/api/recommendations', function () {
     $day = now()->dayOfWeek;
 
@@ -134,15 +141,21 @@ Route::get('/api/recommendations', function () {
     return response()->json($recommendations);
 });
 
+
+// 📩 Ruta para mostrar y enviar el formulario de contacto
 Route::get('/contacte', [ContactController::class, 'create'])->name('contacte');
 Route::post('/contacte', [ContactController::class, 'store']);
 
 
+// 🔒 API REST para gestionar la lista de juegos del usuario autenticado
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/game-list', [GameListController::class, 'index']);
     Route::post('/game-list', [GameListController::class, 'addGame']);
     Route::delete('/game-list/{id}', [GameListController::class, 'removeGame']);
 });
+
+// 🔍 Ruta que busca juegos desde RAWG según el término del usuario (AJAX)
+Route::get('/search-games', [GameSearchController::class, 'search']);
 
 // Cargar rutas adicionales de autenticación
 require __DIR__ . '/auth.php';
