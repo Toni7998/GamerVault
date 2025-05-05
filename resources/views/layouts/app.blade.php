@@ -16,8 +16,9 @@
     <nav class="navbar bg-gray-800 text-white shadow-md">
         <div class="navbar-inner flex justify-between items-center px-6 py-3">
             <a href="{{ route('dashboard') }}">
-                <img src="{{ asset('public/media/logo-gamer_vault_horizontal.png') }}" alt="GamerVault Logo" class="h-10">
+                <img src="{{ asset('media/logo-gamer_vault_horizontal.png') }}" alt="GamerVault Logo" class="h-10">
             </a>
+
             <ul class="flex space-x-6 items-center">
                 <li><a href="{{ route('dashboard') }}" class="nav-link text-lg hover:text-yellow-400">📋 Llistes</a></li>
                 <li><a href="{{ route('friends') }}" class="nav-link text-lg hover:text-yellow-400">👯 Amics</a></li>
