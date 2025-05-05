@@ -45,9 +45,6 @@ function renderGameList(data) {
     el.innerHTML = `
         <h3 class="font-semibold text-lg text-gray-800">${data.name}</h3>
         <p class="text-sm text-gray-500 mt-2">Jocs afegits: ${data.games.length}</p>
-        <button onclick="deleteList(${data.id})" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-200 mt-4">
-            Eliminar
-        </button>
     `;
 
     container.appendChild(el);
