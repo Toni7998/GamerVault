@@ -13,7 +13,9 @@
 
     <nav class="navbar bg-gray-800 text-white shadow-md" style="background-color: #1f1f1f;">
         <div class="navbar-inner flex justify-between items-center px-6 py-3">
-            <h1 class="logo neon-text text-2xl font-bold">🎮 GamerVault</h1>
+            <a href="{{ url('/') }}">
+                <img src="{{ asset('media/logo-gamer_vault_horizontal.png') }}" alt="GamerVault Logo" class="h-10">
+            </a>
             <ul class="navbar-links flex space-x-6 items-center">
                 <li><a href="{{ route('friends') }}" class="nav-link text-lg hover:text-yellow-400">👯 Amics</a></li>
                 <li><a href="{{ route('recomanacions') }}" class="nav-link text-lg hover:text-yellow-400">🔎 Recomanacions</a></li>

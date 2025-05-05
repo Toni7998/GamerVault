@@ -15,7 +15,7 @@
 
     <nav class="navbar bg-gray-800 text-white shadow-md">
         <div class="navbar-inner flex justify-between items-center px-6 py-3">
-            <a href="{{ route('dashboard') }}">
+            <a href="{{ url('/') }}">
                 <img src="{{ asset('media/logo-gamer_vault_horizontal.png') }}" alt="GamerVault Logo" class="h-10">
             </a>
 
