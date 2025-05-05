@@ -79,7 +79,7 @@ Route::get('/api/ranking', function () {
     $response = Http::get('https://api.rawg.io/api/games', [
         'key' => 'a6932e9255e64cf98bfa75abde510c5d',
         'ordering' => '-rating',
-        'page_size' => 10,
+        'page_size' => 20,
     ]);
 
     $games = $response->json()['results'];
@@ -143,8 +143,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/game-list', [GameListController::class, 'addGame']);
     Route::delete('/game-list/{id}', [GameListController::class, 'removeGame']);
 });
-
-
 
 // Cargar rutas adicionales de autenticación
 require __DIR__ . '/auth.php';
