@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Models\GameList;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -17,16 +18,9 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+            \App\Listeners\CreateDefaultGameList::class, // <- Añadimos aquí nuestro listener
         ],
     ];
-
-    /**
-     * Register any events for your application.
-     */
-    public function boot(): void
-    {
-        //
-    }
 
     /**
      * Determine if events and listeners should be automatically discovered.

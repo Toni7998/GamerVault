@@ -29,3 +29,4 @@ Route::get('/friends', function () {
         ['name' => 'Jagger'],
     ]);
 });
+
