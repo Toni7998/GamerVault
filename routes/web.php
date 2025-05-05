@@ -78,7 +78,7 @@ Route::get('/api/ranking', function () {
     $response = Http::get('https://api.rawg.io/api/games', [
         'key' => 'a6932e9255e64cf98bfa75abde510c5d',
         'ordering' => '-rating',
-        'page_size' => 5,
+        'page_size' => 10,
     ]);
 
     $games = $response->json()['results'];
