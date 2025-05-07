@@ -11,12 +11,12 @@ class GameSearchController extends Controller
     {
         $query = $request->input('query');
 
-        if (!$query || strlen($query) < 3) {
+        if (!$query) {
             return response()->json([]);
         }
 
         $response = Http::get('https://api.rawg.io/api/games', [
-            'key' => env('RAWG_API_KEY'),
+            'key' => 'a6932e9255e64cf98bfa75abde510c5d', // directamente aquí
             'search' => $query,
             'page_size' => 10,
         ]);

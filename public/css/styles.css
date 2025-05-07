@@ -532,3 +532,19 @@ footer {
 .bg-customPurple {
     background-color: #5e4285;
 }
+
+.search-input {
+    background-color: #2a2a2a;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    width: 100%;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.search-input::placeholder {
+    color: #aaa;
+}

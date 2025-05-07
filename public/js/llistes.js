@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-
     fetchUserGameList();
 });
 
@@ -40,7 +39,8 @@ function renderGameList(data) {
         "rounded-lg",
         "shadow-md",
         "hover:shadow-lg",
-        "transition-all"
+        "transition-all",
+        "duration-300"
     );
 
     el.innerHTML = `
@@ -56,14 +56,14 @@ let timeout;
 
 searchInput.addEventListener("input", function () {
     clearTimeout(timeout);
+
     const query = searchInput.value.trim();
-    if (query.length >= 3) {
-        timeout = setTimeout(() => searchGames(query), 500); // debounce
-    }
+
+    timeout = setTimeout(() => searchGames(query), 500);
 });
 
 function searchGames(query) {
-    fetch(`/search-games?query=${encodeURIComponent(query)}`) // <- esta línea corregida
+    fetch(`/search-games?query=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(games => {
             console.log("Resultats:", games); // debug
@@ -76,26 +76,52 @@ function searchGames(query) {
 
 function renderSearchResults(games) {
     const container = document.getElementById("search-results");
+    container.className = "grid grid-cols-1 md:grid-cols-2 gap-6"; // 2 columnas en md+
     container.innerHTML = '';
 
     if (!games.length) {
-        container.innerHTML = "<p class='text-center text-gray-500 col-span-3'>No s'han trobat jocs.</p>";
+        container.innerHTML = `
+            <div class="col-span-full text-center text-gray-400 italic py-12 text-lg">
+                No s'han trobat jocs amb aquesta cerca. 😕
+            </div>
+        `;
         return;
     }
 
     games.forEach(game => {
         const card = document.createElement("div");
-        card.className = "p-4 bg-white border rounded shadow hover:shadow-md transition";
-
-        card.innerHTML = `
-            <h4 class="text-lg font-semibold text-gray-800">${game.name}</h4>
-            ${game.background_image ? `<img src="${game.background_image}" alt="${game.name}" class="mt-2 rounded w-full h-40 object-cover">` : ""}
-            <button class="mt-4 w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick='addGameToList(${JSON.stringify(game)})'>Afegir 🎮</button>
+        card.className = `
+            relative rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 opacity-0
         `;
 
+        card.innerHTML = `
+            
+            <div class="absolute inset-0 bg-black/60 text-white flex flex-col justify-between p-4">
+                <div>
+                    <h4 class="text-xl font-semibold">${game.name}</h4>
+                    ${game.released ? `<p class="text-sm text-gray-300">Publicat: ${game.released}</p>` : ''}
+                </div>
+
+ <img src="${game.background_image || 'https://via.placeholder.com/400x200?text=Sense+imatge'}"
+                alt="${game.name}"
+                class="w-full h-60 object-cover">
+            </div>
+
+                <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg self-start transition-all">
+                    Afegir 🎮
+                </button>
+        `;
+
+        card.querySelector("button").addEventListener("click", () => addGameToList(game));
         container.appendChild(card);
+
+        requestAnimationFrame(() => {
+            card.classList.remove('opacity-0');
+            card.classList.add('opacity-100', 'transition-opacity', 'duration-300');
+        });
     });
 }
+
 
 function addGameToList(game) {
     fetch('/game-list/add', {
