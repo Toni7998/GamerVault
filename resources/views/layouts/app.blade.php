@@ -38,8 +38,24 @@
     </nav>
 
     <main class="max-w-4xl mx-auto px-4 py-12 text-center fade-in">
-        @yield('content')
+        @yield('content') <!-- Este es el contenido específico de cada página -->
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-6 mt-10">
+        <div class="container mx-auto">
+            <p>&copy; 2025 GamerVault. Tots els drets reservats.</p>
+            <div class="mt-4">
+                <a href="{{ route('privacy-policy') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Política de Privacitat</a>|
+                <a href="{{ route('terms-of-service') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Condicions d'ús</a>|
+                <a href="mailto:antonio.ruiz@insbaixcamp.cat" class="text-yellow-400 hover:text-yellow-500 mx-2">Contacta'ns</a>
+            </div>
+            <div class="mt-4">
+                <a href="https://twitter.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Twitter</a>
+                <a href="https://facebook.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Facebook</a>
+            </div>
+        </div>
+    </footer>
 
 </body>
 

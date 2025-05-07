@@ -157,5 +157,18 @@ Route::middleware('auth:sanctum')->group(function () {
 // 🔍 Ruta que busca juegos desde RAWG según el término del usuario (AJAX)
 Route::get('/search-games', [GameSearchController::class, 'search']);
 
+// Ruta para la política de privacidad (provisional)
+Route::get('/privacy-policy', function () {
+    return response('<h1>Política de Privacitat</h1><p>Contingut provisional de la política de privacitat.</p>', 200)
+        ->header('Content-Type', 'text/html');
+})->name('privacy-policy');
+
+// Ruta para las condiciones de uso (provisional)
+Route::get('/terms-of-service', function () {
+    return response('<h1>Condicions d\'ús</h1><p>Contingut provisional de les condicions d\'ús.</p>', 200)
+        ->header('Content-Type', 'text/html');
+})->name('terms-of-service');
+
+
 // Cargar rutas adicionales de autenticación
 require __DIR__ . '/auth.php';
