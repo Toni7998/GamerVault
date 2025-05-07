@@ -531,6 +531,13 @@ footer {
 
 .bg-customPurple {
     background-color: #5e4285;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    margin: 10px auto;
+    width: 70%;
+    max-width: 1200px;
+    color: white;
 }
 
 .search-input {
@@ -542,7 +549,7 @@ footer {
     width: 100%;
     font-size: 1rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .search-input::placeholder {

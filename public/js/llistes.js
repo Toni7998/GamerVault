@@ -3,18 +3,31 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function fetchUserGameList() {
-    fetch('/game-list') // corregido aquí
+    fetch('/game-list', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
         .then(response => {
+            console.log(response); // Verifica la respuesta
             if (!response.ok) {
-                throw new Error('Error carregant la llista');
+                return response.text().then(text => {
+                    if (text.startsWith("<!DOCTYPE")) {
+                        throw new Error("Error: Se ha recibido una página HTML en lugar de JSON. Esto podría ser un error en la ruta o una redirección.");
+                    }
+                    throw new Error('Error: ' + text);
+                });
             }
             return response.json();
         })
         .then(data => {
+            console.log("Lista de juegos:", data); // Verifica los datos recibidos
             renderGameList(data);
         })
         .catch(error => {
-            console.error(error);
+            console.error("Error:", error);
             const container = document.getElementById("lists-container");
             container.innerHTML = "<p class='text-red-500 text-center col-span-4'>No s'ha pogut carregar la llista. 😢</p>";
         });
@@ -124,7 +137,7 @@ function renderSearchResults(games) {
 
 
 function addGameToList(game) {
-    fetch('/game-list/add', {
+    fetch('/game-list', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -133,15 +146,27 @@ function addGameToList(game) {
         body: JSON.stringify({ game })
     })
         .then(res => {
-            if (!res.ok) throw new Error("Error afegint joc");
-            return res.json();
+            if (!res.ok) {
+                return res.text().then(text => {
+                    // Verifica si la respuesta es HTML, y muestra detalles si es el caso
+                    if (text.startsWith("<!DOCTYPE")) {
+                        console.error("Error: Se recibió una página HTML en lugar de JSON.");
+                        console.error(text); // Verifica el contenido del HTML
+                        throw new Error("Error: Se ha recibido una página HTML en lugar de JSON. Esto podría ser un error de ruta o redireccionamiento.");
+                    }
+                    // Si no es HTML, lanza el error normal
+                    throw new Error("Error al agregar el juego: " + text);
+                });
+            }
+            return res.json(); // Intenta parsear la respuesta como JSON
         })
         .then(data => {
-            fetchUserGameList(); // refresca la llista
+            console.log("Juego agregado:", data); // Verifica los datos recibidos
+            fetchUserGameList(); // Refresca la lista
             showNotification(`Joc "${game.name}" afegit a la teva llista!`);
         })
         .catch(err => {
-            console.error(err);
+            console.error("Error:", err);
         });
 }
 
