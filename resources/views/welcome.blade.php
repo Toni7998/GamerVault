@@ -73,20 +73,20 @@
             </div>
         </section>
 
-        <section id="popular" class="fade-in" style="margin-top: 5rem;">
-            <h2 class="text-3xl font-bold mb-4">🔥 Llistes Populars</h2>
-            <div class="lists-grid">
-                <div class="list-card">
-                    <h3>🏆 Top RPGs 2025</h3>
-                    <p>Els jocs de rol que més ho estan petant aquest any.</p>
+        <section class="mt-20 fade-in">
+            <h2 class="text-3xl font-bold mb-6 text-center">🎯 Recomanacions destacades</h2>
+            <div class="relative">
+                <div id="carousel-recomanacions" class="carousel-track">
+                    <!-- Recomanacions es carregaran aquí -->
                 </div>
-                <div class="list-card">
-                    <h3>💥 Millors Shooters</h3>
-                    <p>Intensitat, acció i adrenalina garantida.</p>
-                </div>
-                <div class="list-card">
-                    <h3>💎 Indie Jewels</h3>
-                    <p>Petites obres mestres que no et pots perdre.</p>
+            </div>
+        </section>
+
+        <section class="mt-20 fade-in">
+            <h2 class="text-3xl font-bold mb-6 text-center">🏆 Top del ranking</h2>
+            <div class="relative">
+                <div id="carousel-ranking" class="carousel-track">
+                    <!-- Ranking es carregarà aquí -->
                 </div>
             </div>
         </section>
@@ -101,5 +101,89 @@
     </main>
 
 </body>
+
+<script>
+    function scrollCarousel(id, direction) {
+        const el = document.getElementById('carousel-' + id);
+        const cardWidth = el.querySelector('.carousel-card')?.offsetWidth || 300;
+        el.scrollBy({
+            left: direction * (cardWidth + 16),
+            behavior: 'smooth'
+        });
+    }
+
+    const RAWG_API_KEY = "a6932e9255e64cf98bfa75abde510c5d";
+
+    // Recomanacions
+    fetch("/api/recommendations")
+        .then(res => res.json())
+        .then(recs => {
+            const container = document.getElementById("carousel-recomanacions");
+            recs.slice(0, 3).forEach(rec => {
+                fetch(`https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(rec.game)}&page_size=1`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const game = data.results?.[0];
+                        if (!game || !game.background_image) return;
+
+                        const card = document.createElement("div");
+                        card.className = "carousel-card";
+                        card.innerHTML = `
+                            <img src="${game.background_image}" alt="${game.name}">
+                            <div class="p-4">
+                                <h3 class="font-bold text-lg mb-2">${game.name}</h3>
+                                <p class="text-sm text-gray-600">👤 ${rec.sender}</p>
+                                <a href="https://rawg.io/games/${game.slug}" target="_blank" class="text-blue-600 text-sm hover:underline">🔗 RAWG</a>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+            });
+        });
+
+    // Ranking
+    fetch("/api/ranking")
+        .then(res => res.json())
+        .then(games => {
+            const container = document.getElementById("carousel-ranking");
+            games.slice(0, 3).forEach(game => {
+                const card = document.createElement("div");
+                card.className = "carousel-card";
+                card.innerHTML = `
+                    <img src="${game.background_image}" alt="${game.name}">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">${game.name}</h3>
+                        <p class="text-sm text-gray-600">⭐ ${game.rating ?? 'N/A'}</p>
+                        <a href="https://rawg.io/games/${game.slug}" target="_blank" class="text-blue-600 text-sm hover:underline">🔗 RAWG</a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+
+    // Detectar la visibilidad de los carruseles
+    function checkCarouselVisibility() {
+        const carousels = document.querySelectorAll('.relative');
+        carousels.forEach(carousel => {
+            const rect = carousel.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+
+            // Mostrar las flechas si el carrusel es visible
+            const leftBtn = carousel.querySelector('.carousel-btn.left');
+            const rightBtn = carousel.querySelector('.carousel-btn.right');
+
+            if (isVisible) {
+                leftBtn.style.display = 'flex';
+                rightBtn.style.display = 'flex';
+            } else {
+                leftBtn.style.display = 'none';
+                rightBtn.style.display = 'none';
+            }
+        });
+    }
+
+    // Llamar a la función cuando el documento se carga 
+    document.addEventListener('DOMContentLoaded', checkCarouselVisibility);
+</script>
 
 </html>

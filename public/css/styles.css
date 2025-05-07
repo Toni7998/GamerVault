@@ -555,3 +555,71 @@ footer {
 .search-input::placeholder {
     color: #aaa;
 }
+
+.carousel-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 1.5rem;
+    padding: 1rem;
+    scroll-snap-type: x mandatory;
+    /* Añadido para hacer que el carrusel se "ajuste" en cada card */
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-card {
+    min-width: 280px;
+    max-width: 280px;
+    flex: 0 0 auto;
+    background: #2c2c2c;
+    /* Fondo más oscuro y elegante */
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: #eaeaea;
+    scroll-snap-align: start;
+    /* Añadido para que se alinee mejor en el carrusel */
+}
+
+.carousel-card:hover {
+    transform: scale(1.05);
+    /* Aumento sutil para más dinamismo */
+    box-shadow: 0 8px 24px rgba(167, 139, 250, 0.35);
+    /* Sombras más suaves */
+}
+
+.carousel-card img {
+    width: 100%;
+    height: 180px;
+    /* Aumento de altura para mayor impacto visual */
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.carousel-card:hover img {
+    transform: scale(1.05);
+    /* Efecto sutil en la imagen */
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.carousel-btn.left {
+    left: 0;
+}
+
+.carousel-btn.right {
+    right: 0;
+}
