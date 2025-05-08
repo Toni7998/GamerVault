@@ -33,15 +33,13 @@ class GameListController extends Controller
         return response()->json($gameList);
     }
 
-    // Agregar un juego a la lista del usuario
     public function addGame(Request $request)
     {
-        $request->validate([
-            'game_id' => 'required|exists:games,id', // Validar si el juego existe en la base de datos
-        ]);
+        // Validar que se envíe el ID
+        $request->validate(['id' => 'required|integer']);
 
         $user = Auth::user();
-        $gameId = $request->input('game_id');
+        $gameId = $request->input('id');
 
         // Buscar la lista del usuario
         $gameList = GameList::where('user_id', $user->id)->first();
@@ -50,29 +48,40 @@ class GameListController extends Controller
             return response()->json(['error' => 'No tens cap llista'], 404);
         }
 
-        // Verifica si el juego ya está en la base de datos, si no lo está, lo busca en la API de RAWG
+        $gameListId = $gameList->id;
+
+        // Verificar si el juego ya existe en la DB
         $game = Game::find($gameId);
 
+        // Si no existe, obtenerlo de la API y guardarlo
         if (!$game) {
-            $game = $this->getGameFromRawg($gameId);
+            $gameData = $this->getGameFromRawg($gameId);
 
-            if (!$game) {
+            if (!$gameData) {
                 return response()->json(['error' => 'No s\'ha pogut trobar el joc a RAWG'], 404);
             }
 
-            // Crea el juego en la base de datos si no existe
             $game = Game::create([
-                'id' => $game['id'],
-                'name' => $game['name'],
-                'released' => $game['released'] ?? null,
-                'background_image' => $game['background_image'] ?? null,
+                'id' => $gameData['id'],
+                'name' => $gameData['name'],
+                'released' => $gameData['released'] ?? null,
+                'background_image' => $gameData['background_image'] ?? null,
+                'platform' => $gameData['platforms'][0]['platform']['name'] ?? null,
+                'completed' => false,
+                'game_list_id' => $gameListId,
             ]);
+        } else {
+            // Si el juego ya existe pero no está asociado, actualizarlo
+            if ($game->game_list_id !== $gameListId) {
+                $game->game_list_id = $gameListId;
+                $game->save();
+            }
         }
 
-        // Agregar el juego a la lista del usuario
-        $gameList->games()->syncWithoutDetaching([$game->id]);
-
-        return response()->json(['message' => 'Joc afegit correctament', 'game' => $game]);
+        return response()->json([
+            'message' => 'Joc afegit correctament',
+            'game' => $game
+        ]);
     }
 
     // Eliminar un juego de la lista del usuario
@@ -113,6 +122,6 @@ class GameListController extends Controller
         $gameData = $response->json();
 
         // Verifica si el juego está disponible en la respuesta
-        return $gameData ? $gameData['results'][0] : null;
+        return $gameData ?? null;
     }
 }

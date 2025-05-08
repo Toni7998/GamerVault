@@ -141,11 +141,13 @@ function addGameToList(game) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
         },
-        body: JSON.stringify({ game })
+        body: JSON.stringify(game)
     })
         .then(res => {
+            console.log(res.body);
             if (!res.ok) {
                 return res.text().then(text => {
                     // Verifica si la respuesta es HTML, y muestra detalles si es el caso

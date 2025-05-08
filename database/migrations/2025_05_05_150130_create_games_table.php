@@ -12,11 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('games', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary(); // Usamos el ID de la API RAWG
+            $table->string('name');
+            $table->date('released')->nullable();
+            $table->string('background_image')->nullable();
+
+            // Relación con la lista
             $table->foreignId('game_list_id')->constrained()->onDelete('cascade');
-            $table->string('title');
-            $table->string('platform')->nullable(); // opcional
+
+            // Opcionales para tu app
+            $table->string('platform')->nullable();
             $table->boolean('completed')->default(false);
+
             $table->timestamps();
         });
     }

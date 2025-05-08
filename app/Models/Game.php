@@ -6,8 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Game extends Model
 {
-    public function lists()
+    protected $fillable = [
+        'id',
+        'name',
+        'released',
+        'background_image',
+        'platform',
+        'completed',
+        'game_list_id'
+    ];
+
+    public function list()
     {
-        return $this->belongsToMany(GameList::class)->withTimestamps();
+        return $this->belongsTo(GameList::class, 'game_list_id');
     }
 }
