@@ -35,7 +35,7 @@ function fetchUserGameList() {
 
 function renderGameList(data) {
     const container = document.getElementById("lists-container");
-    container.innerHTML = ''; // Limpiar
+    container.innerHTML = ''; // Limpiar contenido actual
 
     if (!data || Object.keys(data).length === 0) {
         container.innerHTML = "<p class='text-gray-600 text-center col-span-4'>No tens cap llista encara. 🗂️</p>";
@@ -56,11 +56,51 @@ function renderGameList(data) {
         "duration-300"
     );
 
+    // Información de la lista (nombre de la lista y cantidad de juegos)
     el.innerHTML = `
         <h3 class="font-semibold text-lg text-gray-800">${data.name}</h3>
         <p class="text-sm text-gray-500 mt-2">Jocs afegits: ${data.games.length}</p>
     `;
 
+    // Aquí se agregarán los juegos en la lista
+    const gamesContainer = document.createElement("div");
+    gamesContainer.classList.add("mt-4", "grid", "grid-cols-1", "sm:grid-cols-2", "lg:grid-cols-3", "gap-6");
+
+    data.games.forEach(game => {
+        const gameCard = document.createElement("div");
+        gameCard.classList.add(
+            "game-card",
+            "p-4",
+            "mb-4",
+            "bg-gray-100",
+            "border",
+            "border-gray-300",
+            "rounded-lg",
+            "shadow-sm",
+            "transition-all",
+            "duration-300"
+        );
+
+        gameCard.innerHTML = `
+            <div class="flex flex-col items-center">
+                
+                <div class="flex flex-col items-center">
+                    <h4 class="font-semibold text-lg text-gray-800">${game.name}</h4>
+                    <p class="text-sm text-gray-500 text-center">${game.description || 'No disponible'}</p>
+                    <p class="text-xs text-gray-400">Gènere: ${game.genre || 'Desconegut'}</p>
+                    <p class="text-xs text-gray-400">Plataforma: ${game.platform || 'Desconeguda'}</p>
+                    ${game.released ? `<p class="text-xs text-gray-400">Publicat: ${game.released}</p>` : ''}
+                </div>
+
+                <img src="${game.background_image || 'https://via.placeholder.com/150x150?text=Sense+imatge'}"
+                    alt="${game.name}">
+            </div>
+        `;
+
+        gamesContainer.appendChild(gameCard);
+    });
+
+    el.appendChild(gamesContainer);
     container.appendChild(el);
 }
 

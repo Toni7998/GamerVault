@@ -104,8 +104,21 @@ body::-webkit-scrollbar-track {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* Estilo para las imágenes de los juegos dentro de la tarjeta */
+.list-card img {
+    width: 50%; /* La imagen ocupa el 50% del ancho de la tarjeta */
+    height: auto; /* Mantiene la proporción de la imagen */
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+    border-radius: 8px; /* Bordes redondeados para las imágenes */
+    margin-bottom: 1rem; /* Espaciado inferior para la imagen */
+}
+
+/* Efecto hover sobre la tarjeta */
 .list-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
