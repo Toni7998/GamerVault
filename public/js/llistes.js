@@ -161,7 +161,7 @@ function searchGames(query) {
 
 function renderSearchResults(games) {
     const container = document.getElementById("search-results");
-    container.className = "grid grid-cols-1 md:grid-cols-2 gap-6"; // 2 columnas en md+
+    container.className = "lists-grid"; // usa el mismo grid que las listas
     container.innerHTML = '';
 
     if (!games.length) {
@@ -174,39 +174,33 @@ function renderSearchResults(games) {
     }
 
     games.forEach(game => {
+        const platforms = game.platforms?.map(p => p.platform.name).join(', ') || 'Desconegudes';
+        const genres = game.genres?.map(g => g.name).join(', ') || 'Sense gènere';
+        const rating = game.rating ? `${game.rating}/5` : 'Sense puntuació';
+        const developers = game.developers?.map(d => d.name).join(', ') || 'Desconegut';
+
         const card = document.createElement("div");
-        card.className = `
-            relative rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 opacity-0
-        `;
+        card.className = "list-card";
 
         card.innerHTML = `
+            <img src="${game.background_image || 'https://via.placeholder.com/400x200?text=Sense+imatge'}"
+                 alt="${game.name}">
             
-            <div class="absolute inset-0 bg-black/60 text-white flex flex-col justify-between p-4">
-                <div>
-                    <h4 class="text-xl font-semibold">${game.name}</h4>
-                    ${game.released ? `<p class="text-sm text-gray-300">Publicat: ${game.released}</p>` : ''}
-                </div>
+            <h4 class="text-white text-lg font-semibold text-center mb-1">${game.name}</h4>
+            ${game.released ? `<p class="text-gray-400 text-sm text-center">Publicat: ${game.released}</p>` : ''}
+            <p class="text-gray-300 text-sm mt-2"><strong>Plataformes:</strong> ${platforms}</p>
+            <p class="text-gray-300 text-sm"><strong>Gèneres:</strong> ${genres}</p>
+            <p class="text-gray-300 text-sm"><strong>Puntuació:</strong> ${rating}</p>
 
- <img src="${game.background_image || 'https://via.placeholder.com/400x200?text=Sense+imatge'}"
-                alt="${game.name}"
-                class="w-full h-60 object-cover">
-            </div>
-
-                <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg self-start transition-all">
-                    Afegir 🎮
-                </button>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-all mt-auto">
+                Afegir 🎮
+            </button>
         `;
 
         card.querySelector("button").addEventListener("click", () => addGameToList(game));
         container.appendChild(card);
-
-        requestAnimationFrame(() => {
-            card.classList.remove('opacity-0');
-            card.classList.add('opacity-100', 'transition-opacity', 'duration-300');
-        });
     });
 }
-
 
 function addGameToList(game) {
     fetch('/game-list', {
