@@ -81,6 +81,10 @@ function renderGameList(data) {
             "duration-300"
         );
 
+        // Cargar estado y comentario desde localStorage si están disponibles
+        const savedStatus = localStorage.getItem(`game-status-${game.id}`);
+        const savedComment = localStorage.getItem(`game-comment-${game.id}`);
+
         gameCard.innerHTML = `
             <img src="${game.background_image || 'https://via.placeholder.com/150x150?text=Sense+imatge'}"
                 alt="${game.name}" class="mb-3 rounded shadow">
@@ -92,15 +96,15 @@ function renderGameList(data) {
                     <label class="block mt-2 text-gray-700">
                         Estat:
                         <select data-game-id="${game.id}" class="status-selector mt-1 p-1 rounded border">
-                            <option value="pendiente" ${game.status === "pendiente" ? "selected" : ""}>🎯 Pendiente</option>
-                            <option value="jugando" ${game.status === "jugando" ? "selected" : ""}>🎮 Jugando</option>
-                            <option value="completado" ${game.status === "completado" ? "selected" : ""}>✅ Completado</option>
+                            <option value="pendiente" ${savedStatus === "pendiente" ? "selected" : game.status === "pendiente" ? "selected" : ""}>🎯 Pendiente</option>
+                            <option value="jugando" ${savedStatus === "jugando" ? "selected" : game.status === "jugando" ? "selected" : ""}>🎮 Jugando</option>
+                            <option value="completado" ${savedStatus === "completado" ? "selected" : game.status === "completado" ? "selected" : ""}>✅ Completado</option>
                         </select>
                     </label>
                     <label class="block mt-2 text-gray-700">
                         Comentaris:
                         <textarea data-game-id="${game.id}" class="comment-box mt-1 p-1 w-full rounded border" rows="2"
-                        placeholder="Escriu una nota...">${game.comment || ''}</textarea>
+                        placeholder="Escriu una nota...">${savedComment || game.comment || ''}</textarea>
                     </label>
                 </div>
                 <button data-game-id="${game.id}" class="remove-game mt-4 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
@@ -249,6 +253,10 @@ function showNotification(message) {
 }
 
 function updateGameStatus(gameId, status) {
+    // Guardar en localStorage
+    localStorage.setItem(`game-status-${gameId}`, status);
+
+    // Enviar al servidor
     fetch(`/game-list/${gameId}/status`, {
         method: 'PUT',
         headers: {
@@ -265,18 +273,36 @@ function updateGameStatus(gameId, status) {
 }
 
 function updateGameComment(gameId, comment) {
+    // Guardar en localStorage
+    localStorage.setItem(`game-comment-${gameId}`, comment);
+
     fetch(`/game-list/${gameId}/comment`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
         },
         body: JSON.stringify({ comment })
     })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    if (text.startsWith("<!DOCTYPE")) {
+                        throw new Error("Error HTML (probable fallo en backend)");
+                    }
+                    throw new Error("Error: " + text);
+                });
+            }
+            return res.json();
+        })
         .then(data => {
             console.log("Comentari guardat", data);
             showNotification("Comentari guardat 📝");
+        })
+        .catch(err => {
+            console.error("Error al guardar el comentari:", err);
+            showNotification("Error al guardar el comentari ⚠️");
         });
 }
 

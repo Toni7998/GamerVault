@@ -129,6 +129,35 @@ class GameListController extends Controller
         return response()->json(['message' => 'Juego eliminado correctamente']);
     }
 
+    public function updateStatus($gameId, Request $request)
+    {
+        $game = Game::find($gameId);
+
+        if (!$game) {
+            return response()->json(['message' => 'Game not found'], 404);
+        }
+
+        $game->status = $request->status;
+        $game->save();
+
+        return response()->json($game);
+    }
+
+    // Para guardar comentarios
+    public function updateComment($gameId, Request $request)
+    {
+        $game = Game::find($gameId);
+
+        if (!$game) {
+            return response()->json(['message' => 'Game not found'], 404);
+        }
+
+        $game->comment = $request->input('comment');
+        $game->save();
+
+        return response()->json($game);
+    }
+
     // Función para obtener el juego desde la API de RAWG
     private function getGameFromRawg($gameId)
     {

@@ -169,8 +169,15 @@ Route::get('/terms-of-service', function () {
         ->header('Content-Type', 'text/html');
 })->name('terms-of-service');
 
-//  sadasd
+
+//  Ruta para eliminar juegos de las listas
 Route::delete('/game-list/{id}', [GameListController::class, 'destroy'])->name('game-list.destroy');
+
+//  Ruta de los estados del juego
+Route::put('/game-list/{gameId}/status', [GameListController::class, 'updateStatus']);
+
+// En routes/web.php o routes/api.php
+Route::put('/game-list/{gameId}/comment', [GameListController::class, 'updateComment']);
 
 // Cargar rutas adicionales de autenticación
 require __DIR__ . '/auth.php';
