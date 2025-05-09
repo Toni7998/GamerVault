@@ -88,7 +88,7 @@ class GameListController extends Controller
     public function removeGame(Request $request)
     {
         $request->validate([
-            'game_id' => 'required|exists:games,id', // Validar si el juego existe
+            'game_id' => 'required|exists:games,id',
         ]);
 
         $user = Auth::user();
@@ -101,10 +101,32 @@ class GameListController extends Controller
             return response()->json(['error' => 'No tens cap llista'], 404);
         }
 
-        // Eliminar el juego de la lista
-        $gameList->games()->detach($gameId);
+        // Buscar el juego que pertenezca a la lista del usuario
+        $game = Game::where('id', $gameId)
+            ->where('game_list_id', $gameList->id)
+            ->first();
+
+        if (!$game) {
+            return response()->json(['error' => 'Aquest joc no és a la teva llista'], 400);
+        }
+
+        // Eliminar el juego de la base de datos
+        $game->delete();
 
         return response()->json(['message' => 'Joc eliminat correctament']);
+    }
+
+    public function destroy($id)
+    {
+        $game = Game::find($id);
+
+        if (!$game) {
+            return response()->json(['message' => 'Juego no encontrado'], 404);
+        }
+
+        $game->delete();
+
+        return response()->json(['message' => 'Juego eliminado correctamente']);
     }
 
     // Función para obtener el juego desde la API de RAWG

@@ -100,6 +100,7 @@ body::-webkit-scrollbar-track {
 /* Tarjetas de lista */
 .list-card {
     background: #2a2a2a;
+    border: 1px solid #3a3a3a;
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -107,21 +108,40 @@ body::-webkit-scrollbar-track {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 1.5rem;
+    /* separación vertical entre tarjetas */
+    margin-right: 1.5rem;
+    /* si están en una cuadrícula horizontal */
+    transition: all 0.3s ease;
 }
 
 /* Estilo para las imágenes de los juegos dentro de la tarjeta */
 .list-card img {
-    width: 50%; /* La imagen ocupa el 50% del ancho de la tarjeta */
-    height: auto; /* Mantiene la proporción de la imagen */
-    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
-    border-radius: 8px; /* Bordes redondeados para las imágenes */
-    margin-bottom: 1rem; /* Espaciado inferior para la imagen */
+    width: 50%;
+    /* La imagen ocupa el 50% del ancho de la tarjeta */
+    height: auto;
+    /* Mantiene la proporción de la imagen */
+    object-fit: cover;
+    /* Asegura que la imagen se ajuste correctamente */
+    border-radius: 8px;
+    /* Bordes redondeados para las imágenes */
+    margin-bottom: 1rem;
+    /* Espaciado inferior para la imagen */
 }
 
 /* Efecto hover sobre la tarjeta */
 .list-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.list-card::after {
+    content: '';
+    display: block;
+    width: 80%;
+    height: 2px;
+    background: #444;
+    margin-top: 1rem;
 }
 
 /* Títulos */
@@ -635,4 +655,33 @@ footer {
 
 .carousel-btn.right {
     right: 0;
+}
+
+.game-card {
+    background: #1f1f1f;
+    color: #e0e0e0;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.game-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.game-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.game-card:not(:last-child) {
+    border-bottom: 2px dashed #444;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
 }

@@ -169,6 +169,8 @@ Route::get('/terms-of-service', function () {
         ->header('Content-Type', 'text/html');
 })->name('terms-of-service');
 
+//  sadasd
+Route::delete('/game-list/{id}', [GameListController::class, 'destroy'])->name('game-list.destroy');
 
 // Cargar rutas adicionales de autenticación
 require __DIR__ . '/auth.php';

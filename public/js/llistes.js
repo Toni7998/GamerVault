@@ -82,20 +82,48 @@ function renderGameList(data) {
         );
 
         gameCard.innerHTML = `
-            <div class="flex flex-col items-center">
-                
-                <div class="flex flex-col items-center">
-                    <h4 class="font-semibold text-lg text-gray-800">${game.name}</h4>
-                    <p class="text-sm text-gray-500 text-center">${game.description || 'No disponible'}</p>
-                    <p class="text-xs text-gray-400">Gènere: ${game.genre || 'Desconegut'}</p>
-                    <p class="text-xs text-gray-400">Plataforma: ${game.platform || 'Desconeguda'}</p>
-                    ${game.released ? `<p class="text-xs text-gray-400">Publicat: ${game.released}</p>` : ''}
+            <img src="${game.background_image || 'https://via.placeholder.com/150x150?text=Sense+imatge'}"
+                alt="${game.name}" class="mb-3 rounded shadow">
+    
+            <div class="text-center">
+                <h4 class="font-semibold text-lg mb-1">${game.name}</h4>
+                <div class="mt-2 text-xs text-gray-500 space-y-1">
+                    <p><strong>Plataforma:</strong> ${game.platform || 'Desconeguda'}</p>
+                    <label class="block mt-2 text-gray-700">
+                        Estat:
+                        <select data-game-id="${game.id}" class="status-selector mt-1 p-1 rounded border">
+                            <option value="pendiente" ${game.status === "pendiente" ? "selected" : ""}>🎯 Pendiente</option>
+                            <option value="jugando" ${game.status === "jugando" ? "selected" : ""}>🎮 Jugando</option>
+                            <option value="completado" ${game.status === "completado" ? "selected" : ""}>✅ Completado</option>
+                        </select>
+                    </label>
+                    <label class="block mt-2 text-gray-700">
+                        Comentaris:
+                        <textarea data-game-id="${game.id}" class="comment-box mt-1 p-1 w-full rounded border" rows="2"
+                        placeholder="Escriu una nota...">${game.comment || ''}</textarea>
+                    </label>
                 </div>
-
-                <img src="${game.background_image || 'https://via.placeholder.com/150x150?text=Sense+imatge'}"
-                    alt="${game.name}">
+                <button data-game-id="${game.id}" class="remove-game mt-4 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
+                    🗑️ Eliminar
+                </button>
             </div>
         `;
+
+        // ✅ Mueve aquí los listeners, una vez que gameCard.innerHTML ya fue añadido
+        gameCard.querySelector('.status-selector').addEventListener('change', e => {
+            const gameId = e.target.dataset.gameId;
+            updateGameStatus(gameId, e.target.value);
+        });
+
+        gameCard.querySelector('.comment-box').addEventListener('blur', e => {
+            const gameId = e.target.dataset.gameId;
+            updateGameComment(gameId, e.target.value);
+        });
+
+        gameCard.querySelector('.remove-game').addEventListener('click', e => {
+            const gameId = e.target.dataset.gameId;
+            removeGameFromList(gameId);
+        });
 
         gamesContainer.appendChild(gameCard);
     });
@@ -218,4 +246,71 @@ function showNotification(message) {
     msg.textContent = message;
     notif.classList.remove("hidden");
     setTimeout(() => notif.classList.add("hidden"), 3000);
+}
+
+function updateGameStatus(gameId, status) {
+    fetch(`/game-list/${gameId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ status })
+    })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Estat actualitzat", data);
+            showNotification("Estat actualitzat correctament ✅");
+        });
+}
+
+function updateGameComment(gameId, comment) {
+    fetch(`/game-list/${gameId}/comment`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ comment })
+    })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Comentari guardat", data);
+            showNotification("Comentari guardat 📝");
+        });
+}
+
+function removeGameFromList(gameId) {
+    // Preguntar al usuario si está seguro de eliminar el juego
+    if (confirm("Estàs segur de voler eliminar aquest joc de la teva llista?")) {
+        fetch(`/game-list/${gameId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            }
+        })
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(text => {
+                        if (text.startsWith("<!DOCTYPE")) {
+                            throw new Error("Error HTML (probable fallo en backend)");
+                        }
+                        throw new Error("Error: " + text);
+                    });
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("Eliminat:", data);
+                fetchUserGameList();
+                showNotification("Joc eliminat correctament 🗑️");
+            })
+            .catch(err => {
+                console.error("Error al eliminar:", err);
+            });
+    } else {
+        console.log("Eliminació cancel·lada");
+    }
 }
