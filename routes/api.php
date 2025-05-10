@@ -23,6 +23,6 @@ Route::get('/recommendations', function () {
     ]);
 });
 
-Route::middleware('auth:sanctum')->get('/friends', [FriendController::class, 'index']);
+Route::middleware('auth')->get('/friends', [FriendController::class, 'index']);
 
 Route::get('/search-games', [GameSearchController::class, 'search']);

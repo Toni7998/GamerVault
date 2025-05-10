@@ -21,9 +21,7 @@ class FriendController extends Controller
         $user = Auth::user();
 
         // Obtener amigos con la relación allFriends
-        $friends = $user->allFriends()
-            ->select('users.id', 'users.name') // Selecciona solo los campos necesarios
-            ->get();
+        $friends = $user->allFriends()->get(['users.id','users.name']); 
 
         return response()->json($friends);
     }

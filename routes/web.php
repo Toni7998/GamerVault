@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
 
     // Ruta para la vista de amigos (debería cargar `pages.friends`), protegida por autenticación
     Route::view('/friends', 'pages.friends')->name('friends');
+    Route::get('/api/friends', [FriendController::class, 'index'])->name('friends.list');
 
     // Rutas de solicitudes de amigos (envío, aceptación, rechazo)
     Route::post('/friends/send/{receiverId}', [FriendController::class, 'sendRequest'])->name('friends.send');
@@ -63,25 +64,6 @@ Route::middleware('auth')->group(function () {
 // Rutas SSO con Github para autenticación (login con Github)
 Route::get('auth/github', function () {
     return Socialite::driver('github')->redirect();
-});
-
-Route::get('auth/github/callback', function () {
-    $githubUser = Socialite::driver('github')->user();
-
-    // Buscar o crear el usuario basado en el email de Github
-    $user = User::updateOrCreate(
-        ['email' => $githubUser->getEmail()],
-        [
-            'name' => $githubUser->getName() ?? $githubUser->getNickname(),
-            'email' => $githubUser->getEmail(),
-            'github_id' => $githubUser->getId(),
-            'avatar' => $githubUser->getAvatar(),
-        ]
-    );
-
-    Auth::login($user);
-
-    return redirect('/dashboard');
 });
 
 // 🧠 Ruta API para obtener los 20 juegos mejor valorados desde RAWG
