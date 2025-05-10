@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameSearchController;
+use App\Http\Controllers\FriendController;
 
 Route::get('/lists', function () {
     return response()->json([
@@ -15,7 +16,6 @@ Route::post('/lists', function () {
     return response()->json(['success' => true]);
 });
 
-
 Route::get('/recommendations', function () {
     return response()->json([
         ['sender' => 'Roger', 'game' => 'Elden Ring'],
@@ -23,12 +23,6 @@ Route::get('/recommendations', function () {
     ]);
 });
 
-Route::get('/friends', function () {
-    return response()->json([
-        ['name' => 'Lin'],
-        ['name' => 'JaniraLaPrimera'],
-        ['name' => 'Jagger'],
-    ]);
-});
+Route::middleware('auth:sanctum')->get('/friends', [FriendController::class, 'index']);
 
 Route::get('/search-games', [GameSearchController::class, 'search']);
