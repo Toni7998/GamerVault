@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Api\GameListController;
 use App\Http\Controllers\GameSearchController;
-use App\Http\Controllers\FriendController;
 use App\Http\Controllers\UserSearchController;
+use App\Http\Controllers\FriendController;
 
 /*
 |----------------------------------------------------------------------
@@ -70,6 +70,24 @@ Route::get('auth/github', function () {
     return Socialite::driver('github')->redirect();
 });
 
+Route::get('auth/github/callback', function () {
+    $githubUser = Socialite::driver('github')->user();
+
+    // Buscar o crear el usuario basado en el email de Github
+    $user = User::updateOrCreate(
+        ['email' => $githubUser->getEmail()],
+        [
+            'name' => $githubUser->getName() ?? $githubUser->getNickname(),
+            'email' => $githubUser->getEmail(),
+            'github_id' => $githubUser->getId(),
+            'avatar' => $githubUser->getAvatar(),
+        ]
+    );
+
+    Auth::login($user);
+
+    return redirect('/dashboard');
+});
 
 // 🧠 Ruta API para obtener los 20 juegos mejor valorados desde RAWG
 Route::get('/api/ranking', function () {
@@ -182,6 +200,11 @@ Route::put('/game-list/{gameId}/comment', [GameListController::class, 'updateCom
 Route::middleware(['auth'])->group(function () {
     Route::get('/users/search', [UserSearchController::class, 'search'])->name('users.search');
 });
+
+
+//  Ruta para enviar solicitud de amistad a la gente
+Route::middleware('auth:sanctum')->post('/friends/request', [FriendController::class, 'sendRequest']);
+
 
 // Cargar rutas adicionales de autenticación (como las de login)
 require __DIR__ . '/auth.php';

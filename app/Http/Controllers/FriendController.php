@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Friendship;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class FriendController extends Controller
 {
@@ -21,27 +22,44 @@ class FriendController extends Controller
         $user = Auth::user();
 
         // Obtener amigos con la relación allFriends
-        $friends = $user->allFriends()->get(['users.id','users.name']); 
+        $friends = $user->allFriends()->get(['users.id', 'users.name']);
 
         return response()->json($friends);
     }
 
-    public function sendRequest($receiverId)
+    public function sendRequest(Request $request)
     {
-        /** @var User $user */
-        $user = Auth::user();
-
-        if ($receiverId == $user->id) {
-            return back()->with('error', 'No puedes agregarte a ti mismo');
-        }
-
-        Friendship::firstOrCreate([
-            'sender_id' => $user->id,
-            'receiver_id' => $receiverId,
-            'status' => 'pending' // Asegúrate de incluir el estado inicial
+        $request->validate([
+            'user_id' => 'required|exists:users,id|not_in:' . Auth::id(),
         ]);
 
-        return back()->with('success', 'Solicitud enviada');
+        /** @var User $sender */
+        $sender = Auth::user();
+        $receiverId = $request->input('user_id');
+
+        // Prevenir duplicados en ambos sentidos (amistades o solicitudes pendientes)
+        $exists = Friendship::where(function ($query) use ($sender, $receiverId) {
+            $query->where('sender_id', $sender->id)
+                ->where('receiver_id', $receiverId)
+                ->whereIn('status', ['pending', 'accepted']);  // Comprobamos también si ya es amigo
+        })->orWhere(function ($query) use ($sender, $receiverId) {
+            $query->where('sender_id', $receiverId)
+                ->where('receiver_id', $sender->id)
+                ->whereIn('status', ['pending', 'accepted']);  // Verificamos también en dirección contraria
+        })->exists();
+
+        if ($exists) {
+            return response()->json(['message' => 'Ja hi ha una sol·licitud o amistat.'], 409);
+        }
+
+        // Crear solicitud de amistad
+        Friendship::create([
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiverId,
+            'status' => 'pending'
+        ]);
+
+        return response()->json(['message' => 'Sol·licitud enviada']);
     }
 
     public function acceptRequest($senderId)

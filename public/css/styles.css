@@ -148,6 +148,33 @@ body::-webkit-scrollbar-track {
     margin-top: 1rem;
 }
 
+.star-rating {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 1.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.star-rating span {
+    color: #d1d5db;
+    /* gray-300 */
+    transition: color 0.2s;
+}
+
+.star-rating span.selected,
+.star-rating span.text-yellow-400 {
+    color: #facc15;
+    /* yellow-400 */
+}
+
+/* Opcional: efecto hover suave */
+.star-rating span:hover {
+    opacity: 0.8;
+}
+
 /* Títulos */
 h1,
 h2,

@@ -75,7 +75,7 @@
     });
 
     function sendFriendRequest(userId, button) {
-        fetch('/api/friends/request', {
+        fetch('/friends/request', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
