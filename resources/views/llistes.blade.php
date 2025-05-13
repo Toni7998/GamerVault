@@ -20,7 +20,7 @@
     <br>
 
     <!-- Contenedor donde se cargará la lista -->
-    <section id="lists-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+    <section id="lists-container" class="space-y-6">
         {{-- La llista es carregarà aquí via JS --}}
     </section>
 

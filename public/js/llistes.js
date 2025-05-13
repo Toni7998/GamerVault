@@ -69,6 +69,8 @@ function renderGameList(data) {
         const gameCard = document.createElement("div");
         gameCard.classList.add(
             "game-card",
+            "flex",
+            "gap-4",
             "p-4",
             "mb-4",
             "bg-gray-100",
@@ -87,8 +89,9 @@ function renderGameList(data) {
 
         gameCard.innerHTML = `
             <img src="${game.background_image || 'https://via.placeholder.com/150x150?text=Sense+imatge'}"
-                 alt="${game.name}" class="mb-3 rounded shadow">
-            <div class="text-center">
+     alt="${game.name}" class="w-40 h-40 object-cover rounded shadow">
+<div class="flex-1">
+
                 <h4 class="font-semibold text-lg mb-1">${game.name}</h4>
                 <div class="mt-2 text-xs text-gray-500 space-y-1">
                     <label class="block mt-2 text-gray-700">
@@ -123,9 +126,10 @@ function renderGameList(data) {
                 </label>
                 
                 <br>
-                <button data-game-id="${game.id}" class="remove-game mt-4 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
-                    🗑️ Eliminar
-                </button>
+                <button data-game-id="${game.id}" class="remove-game delete-button bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
+    🗑️
+</button>
+
             </div>
         `;
 
@@ -154,10 +158,10 @@ function renderGameList(data) {
             star.addEventListener('click', e => {
                 const selectedValue = parseInt(e.target.dataset.value);
                 const gameId = e.target.closest('.star-rating').dataset.gameId;
-                
+
                 // Guardar la valoración en localStorage
                 localStorage.setItem(`game-rating-${gameId}`, selectedValue);
-                
+
                 // Actualizar todas las estrellas
                 const allStars = e.target.parentElement.querySelectorAll('span');
                 allStars.forEach((s, i) => {

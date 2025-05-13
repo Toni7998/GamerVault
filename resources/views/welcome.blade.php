@@ -55,35 +55,40 @@
             @endauth
         </header>
 
-        <section id="caracteristiques" class="fade-in" style="margin-top: 5rem;">
-            <h2 class="text-3xl font-bold mb-4">🔹 Què ofereix GamerVault?</h2>
-            <div class="lists-grid">
-                <div class="list-card">
-                    <h3>📂 Organitza</h3>
-                    <p>Crea i administra les teves pròpies llistes de videojocs fàcilment.</p>
-                </div>
-                <div class="list-card">
-                    <h3>🔗 Comparteix</h3>
-                    <p>Ensenya als teus amics què estàs jugant o què recomanes.</p>
-                </div>
-                <div class="list-card">
-                    <h3>🔍 Descobreix</h3>
-                    <p>Explora recomanacions personalitzades segons els teus gustos.</p>
-                </div>
+        <h2 class="section-title text-center mb-12">Què ofereix GamerVault?</h2>
+
+        <div class="features-grid">
+            <div class="feature-card organize">
+                <h3 class="feature-title">📂 Organitza</h3>
+                <p class="feature-description">Crea i administra les teves pròpies llistes de videojocs fàcilment.</p>
             </div>
-        </section>
+
+            <div class="feature-card share">
+                <h3 class="feature-title">🔗 Comparteix</h3>
+                <p class="feature-description">Ensenya als teus amics què estàs jugant o què recomanes.</p>
+            </div>
+
+            <div class="feature-card discover">
+                <h3 class="feature-title">🔍 Descobreix</h3>
+                <p class="feature-description">Explora recomanacions personalitzades segons els teus gustos.</p>
+            </div>
+        </div>
+
+        <br>
 
         <section class="mt-20 fade-in">
-            <h2 class="text-3xl font-bold mb-6 text-center">🎯 Recomanacions destacades</h2>
+            <h2 class="text-3xl font-bold mb-6 text-center">Recomanacions destacades</h2>
             <div class="relative">
                 <div id="carousel-recomanacions" class="carousel-track">
                     <!-- Recomanacions es carregaran aquí -->
                 </div>
             </div>
         </section>
-
+        
+        <br>
+        
         <section class="mt-20 fade-in">
-            <h2 class="text-3xl font-bold mb-6 text-center">🏆 Top del ranking</h2>
+            <h2 class="text-3xl font-bold mb-6 text-center">Top del ranking</h2>
             <div class="relative">
                 <div id="carousel-ranking" class="carousel-track">
                     <!-- Ranking es carregarà aquí -->
@@ -118,15 +123,6 @@
 </footer>
 
 <script>
-    function scrollCarousel(id, direction) {
-        const el = document.getElementById('carousel-' + id);
-        const cardWidth = el.querySelector('.carousel-card')?.offsetWidth || 300;
-        el.scrollBy({
-            left: direction * (cardWidth + 16),
-            behavior: 'smooth'
-        });
-    }
-
     const RAWG_API_KEY = "a6932e9255e64cf98bfa75abde510c5d";
 
     // Recomanacions
@@ -175,30 +171,6 @@
                 container.appendChild(card);
             });
         });
-
-    // Detectar la visibilidad de los carruseles
-    function checkCarouselVisibility() {
-        const carousels = document.querySelectorAll('.relative');
-        carousels.forEach(carousel => {
-            const rect = carousel.getBoundingClientRect();
-            const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
-
-            // Mostrar las flechas si el carrusel es visible
-            const leftBtn = carousel.querySelector('.carousel-btn.left');
-            const rightBtn = carousel.querySelector('.carousel-btn.right');
-
-            if (isVisible) {
-                leftBtn.style.display = 'flex';
-                rightBtn.style.display = 'flex';
-            } else {
-                leftBtn.style.display = 'none';
-                rightBtn.style.display = 'none';
-            }
-        });
-    }
-
-    // Llamar a la función cuando el documento se carga 
-    document.addEventListener('DOMContentLoaded', checkCarouselVisibility);
 </script>
 
 </html>

@@ -89,17 +89,20 @@ Route::get('auth/github/callback', function () {
     return redirect('/dashboard');
 });
 
-// 🧠 Ruta API para obtener los 20 juegos mejor valorados desde RAWG
+
 Route::get('/api/ranking', function () {
     $response = Http::get('https://api.rawg.io/api/games', [
         'key' => 'a6932e9255e64cf98bfa75abde510c5d',
         'ordering' => '-rating',
-        'page_size' => 20,
+        'page_size' => 21,
     ]);
 
     $games = $response->json()['results'];
 
-    return response()->json($games);
+    // Omitir el primer juego
+    $gamesSinPrimero = array_slice($games, 1);
+
+    return response()->json($gamesSinPrimero);
 });
 
 

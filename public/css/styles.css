@@ -70,111 +70,6 @@ body::-webkit-scrollbar-track {
     align-items: center;
 }
 
-
-/* Container principal */
-.container {
-    padding: 2rem;
-    margin: auto;
-}
-
-/* Animación fade-in */
-.fade-in {
-    animation: fadeIn 0.6s ease forwards;
-    opacity: 0;
-}
-
-@keyframes fadeIn {
-    to {
-        opacity: 1;
-    }
-}
-
-/* Grid de listas */
-.lists-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
-
-/* Tarjetas de lista */
-.list-card {
-    background: #2a2a2a;
-    border: 1px solid #3a3a3a;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    /* separación vertical entre tarjetas */
-    margin-right: 1.5rem;
-    /* si están en una cuadrícula horizontal */
-    transition: all 0.3s ease;
-}
-
-/* Reutiliza .lists-grid y .list-card como en las listas */
-
-/* Mejora visual de la imagen */
-.list-card img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    transition: transform 0.3s ease;
-}
-
-/* Hover suave de imagen */
-.list-card:hover img {
-    transform: scale(1.05);
-}
-
-/* Botón en la tarjeta */
-.list-card button {
-    width: 100%;
-    max-width: 200px;
-}
-
-.list-card::after {
-    content: '';
-    display: block;
-    width: 80%;
-    height: 2px;
-    background: #444;
-    margin-top: 1rem;
-}
-
-.star-rating {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 1.75rem;
-    cursor: pointer;
-    user-select: none;
-}
-
-.star-rating span {
-    color: #d1d5db;
-    /* gray-300 */
-    transition: color 0.2s;
-}
-
-.star-rating span.selected,
-.star-rating span.text-yellow-400 {
-    color: #facc15;
-    /* yellow-400 */
-}
-
-/* Opcional: efecto hover suave */
-.star-rating span:hover {
-    opacity: 0.8;
-}
-
 /* Títulos */
 h1,
 h2,
@@ -254,6 +149,258 @@ button {
 
 .text-light {
     color: #f0f0f0;
+}
+
+
+/* Container principal */
+.container {
+    padding: 2rem;
+    margin: auto;
+}
+
+/* Animación fade-in */
+.fade-in {
+    animation: fadeIn 0.6s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Sección de características de la página principal*/
+
+/* Título */
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Grid de características */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 0 2rem;
+}
+
+/* Tarjetas de características */
+.feature-card {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    text-align: center;
+    transform: translateY(0);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Efectos de Hover */
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Títulos de las características */
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+/* Descripción */
+.feature-description {
+    font-size: 1rem;
+    color: #ddd;
+    line-height: 1.6;
+}
+
+/* Colores por cada tarjeta */
+.organize {
+    background: linear-gradient(135deg, #4c3e6f, #b67e9d);
+    border-left: 8px solid #6a4c93;
+}
+
+.share {
+    background: linear-gradient(135deg, #4e7e9e, #6abfa4);
+    border-left: 8px solid #4ca8a7;
+}
+
+.discover {
+    background: linear-gradient(135deg, #ff6f61, #ff9d5c);
+    border-left: 8px solid #f8b300;
+}
+
+/* Animación fade-in para cada elemento */
+.fade-in {
+    animation: fadeIn 1.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Carousels de la página principal*/
+.carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-card {
+    flex: 0 0 auto;
+    width: 280px;
+    background: #2c2c2c;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    color: #eaeaea;
+    scroll-snap-align: start;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.carousel-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(167, 139, 250, 0.35);
+}
+
+.carousel-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.carousel-card:hover img {
+    transform: scale(1.05);
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.5rem;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.carousel-btn.left {
+    left: 0;
+}
+
+.carousel-btn.right {
+    right: 0;
+}
+
+/* Grid de listas */
+.lists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* Tarjetas de lista */
+.list-card {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    /* separación vertical entre tarjetas */
+    margin-right: 1.5rem;
+    /* si están en una cuadrícula horizontal */
+    transition: all 0.3s ease;
+}
+
+/* Mejora visual de la imagen */
+.list-card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
+}
+
+/* Hover suave de imagen */
+.list-card:hover img {
+    transform: scale(1.05);
+}
+
+/* Botón en la tarjeta */
+.list-card button {
+    width: 100%;
+    max-width: 200px;
+}
+
+.list-card::after {
+    content: '';
+    display: block;
+    width: 80%;
+    height: 2px;
+    background: #444;
+    margin-top: 1rem;
+}
+
+/* Estrellas de la valoración personal*/
+
+.star-rating {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 1.75rem;
+    cursor: pointer;
+}
+
+.star-rating span {
+    color: #d1d5db;
+    /* gray-300 */
+    transition: color 0.2s, opacity 0.2s;
+}
+
+/* Amarillo */
+.star-rating span.selected,
+.star-rating span.text-yellow-400 {
+    color: #facc15;
+    /* yellow-400 */
+}
+
+.star-rating span:hover {
+    opacity: 0.8;
 }
 
 /* Estilo de los elementos del ranking */
@@ -620,99 +767,82 @@ footer {
     color: #aaa;
 }
 
-.carousel-track {
-    display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    gap: 1.5rem;
-    padding: 1rem;
-    scroll-snap-type: x mandatory;
-    /* Añadido para hacer que el carrusel se "ajuste" en cada card */
-}
-
-.carousel-track::-webkit-scrollbar {
-    display: none;
-}
-
-.carousel-card {
-    min-width: 280px;
-    max-width: 280px;
-    flex: 0 0 auto;
-    background: #2c2c2c;
-    /* Fondo más oscuro y elegante */
-    border-radius: 1rem;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    color: #eaeaea;
-    scroll-snap-align: start;
-    /* Añadido para que se alinee mejor en el carrusel */
-}
-
-.carousel-card:hover {
-    transform: scale(1.05);
-    /* Aumento sutil para más dinamismo */
-    box-shadow: 0 8px 24px rgba(167, 139, 250, 0.35);
-    /* Sombras más suaves */
-}
-
-.carousel-card img {
-    width: 100%;
-    height: 180px;
-    /* Aumento de altura para mayor impacto visual */
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.carousel-card:hover img {
-    transform: scale(1.05);
-    /* Efecto sutil en la imagen */
-}
-
-.carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5);
-    color: #fff;
-    border: none;
-    padding: 0.5rem;
-    cursor: pointer;
-}
-
-.carousel-btn.left {
-    left: 0;
-}
-
-.carousel-btn.right {
-    right: 0;
-}
-
+/* Estilo horizontal oscuro para game cards */
 .game-card {
-    background: #1f1f1f;
-    color: #e0e0e0;
-    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    border: 1px solid #333;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
 }
 
 .game-card:hover {
     transform: scale(1.02);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
 }
 
+/* Imagen a la izquierda */
 .game-card img {
-    width: 100%;
-    height: 160px;
+    width: 160px;
+    height: 100px;
     object-fit: cover;
     border-radius: 8px;
-    margin-top: 1rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
 }
 
+.game-card:hover img {
+    transform: scale(1.05);
+}
+
+/* Separación entre tarjetas */
 .game-card:not(:last-child) {
     border-bottom: 2px dashed #444;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
+}
+
+/* Contenido de texto */
+.game-card .text-center {
+    flex: 1;
+    color: #ddd;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.game-card .text-center h3,
+.game-card .text-center p {
+    margin: 0.2rem 0;
+}
+
+/* Contenedor de tarjetas */
+.games-container-horizontal {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Botón eliminar alineado a la derecha */
+.delete-button {
+    background-color: #dc2626;
+    /* rojo */
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-end;
+}
+
+.delete-button:hover {
+    background-color: #b91c1c;
+    /* rojo más oscuro */
 }
