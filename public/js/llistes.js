@@ -1,7 +1,13 @@
+
+//  Hacemos que cuando arranca la web se haga lo que esta dentro del código
 document.addEventListener('DOMContentLoaded', function () {
     fetchUserGameList();
 });
 
+
+/**
+ * Funció perquè l'usuari només tingui una llista que sigui la seva
+ */
 function fetchUserGameList() {
     fetch('/game-list', {
         method: 'GET',
@@ -11,11 +17,13 @@ function fetchUserGameList() {
         }
     })
         .then(response => {
-            console.log(response); // Verifica la respuesta
+
+            // Verifica la resposta
+            console.log(response); 
             if (!response.ok) {
                 return response.text().then(text => {
                     if (text.startsWith("<!DOCTYPE")) {
-                        throw new Error("Error: Se ha recibido una página HTML en lugar de JSON. Esto podría ser un error en la ruta o una redirección.");
+                        throw new Error("Error: S'ha rebut una pàgina HTML en lloc de JSON. Pot ser un error de ruta o una redirecció.");
                     }
                     throw new Error('Error: ' + text);
                 });
@@ -23,7 +31,9 @@ function fetchUserGameList() {
             return response.json();
         })
         .then(data => {
-            console.log("Lista de juegos:", data); // Verifica los datos recibidos
+
+            // Verifica les dades rebudes
+            console.log("Llista de jocs:", data); 
             renderGameList(data);
         })
         .catch(error => {
@@ -33,6 +43,11 @@ function fetchUserGameList() {
         });
 }
 
+/**
+ * Funció per mostrar la llista
+ * @param {*} data 
+ * @returns 
+ */
 function renderGameList(data) {
     const container = document.getElementById("lists-container");
     container.innerHTML = ''; // Limpiar contenido actual
@@ -97,9 +112,9 @@ function renderGameList(data) {
                     <label class="block mt-2 text-gray-700">
                         Estat:
                         <select data-game-id="${game.id}" class="status-selector mt-1 p-1 rounded border">
-                            <option value="pendiente" ${savedStatus === "pendiente" ? "selected" : game.status === "pendiente" ? "selected" : ""}>🎯 Pendiente</option>
-                            <option value="jugando" ${savedStatus === "jugando" ? "selected" : game.status === "jugando" ? "selected" : ""}>🎮 Jugando</option>
-                            <option value="completado" ${savedStatus === "completado" ? "selected" : game.status === "completado" ? "selected" : ""}>✅ Completado</option>
+                            <option value="pendiente" ${savedStatus === "pendiente" ? "selected" : game.status === "pendiente" ? "selected" : ""}>🎯 Pendent</option>
+                            <option value="jugando" ${savedStatus === "jugando" ? "selected" : game.status === "jugando" ? "selected" : ""}>🎮 Jugant</option>
+                            <option value="completado" ${savedStatus === "completado" ? "selected" : game.status === "completado" ? "selected" : ""}>✅ Completat</option>
                         </select>
                     </label>
 
@@ -202,6 +217,11 @@ searchInput.addEventListener("input", function () {
     timeout = setTimeout(() => searchGames(query), 500);
 });
 
+
+/**
+ * Funció per buscar els jocs a la barra de cerca
+ * @param {*} query 
+ */
 function searchGames(query) {
     fetch(`/search-games?query=${encodeURIComponent(query)}`)
         .then(res => res.json())
@@ -214,6 +234,12 @@ function searchGames(query) {
         });
 }
 
+
+/**
+ * Funció perquè apareguin els jocs de la cerca
+ * @param {*} games 
+ * @returns 
+ */
 function renderSearchResults(games) {
     const container = document.getElementById("search-results");
     container.className = "lists-grid"; // usa el mismo grid que las listas
@@ -257,55 +283,81 @@ function renderSearchResults(games) {
     });
 }
 
+
+/**
+ * Funció per afegir els jocs a la llista
+ * @param {*} game 
+ */
 function addGameToList(game) {
-    fetch('/game-list', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json',
-        },
-        body: JSON.stringify(game)
-    })
-        .then(res => {
-            console.log(res.body);
-            if (!res.ok) {
-                return res.text().then(text => {
-                    // Verifica si la respuesta es HTML, y muestra detalles si es el caso
-                    if (text.startsWith("<!DOCTYPE")) {
-                        console.error("Error: Se recibió una página HTML en lugar de JSON.");
-                        console.error(text); // Verifica el contenido del HTML
-                        throw new Error("Error: Se ha recibido una página HTML en lugar de JSON. Esto podría ser un error de ruta o redireccionamiento.");
+    Swal.fire({
+        title: 'Afegir joc a la llista?',
+        text: `Vols afegir "${game.name}" a la teva llista?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, afegeix-lo!',
+        cancelButtonText: 'Cancel·la',
+        background: '#1e1e1e',
+        color: '#f0f0f0',
+        confirmButtonColor: '#4caf50',
+        cancelButtonColor: '#f44336'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/game-list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(game)
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.text().then(text => {
+                            if (text.startsWith("<!DOCTYPE")) {
+                                throw new Error("Error: S'ha rebut una pàgina HTML en lloc de JSON.");
+                            }
+                            throw new Error("Error al afegir el joc: " + text);
+                        });
                     }
-                    // Si no es HTML, lanza el error normal
-                    throw new Error("Error al agregar el juego: " + text);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log("Joc afegit:", data);
+                    fetchUserGameList();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Afegit!',
+                        text: `El joc "${game.name}" ha estat afegit a la teva llista!`,
+                        timer: 2000,
+                        showConfirmButton: false,
+                        background: '#1e1e1e',
+                        color: '#f0f0f0'
+                    });
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: err.message,
+                        background: '#1e1e1e',
+                        color: '#f0f0f0'
+                    });
                 });
-            }
-            return res.json(); // Intenta parsear la respuesta como JSON
-        })
-        .then(data => {
-            console.log("Juego agregado:", data); // Verifica los datos recibidos
-            fetchUserGameList(); // Refresca la lista
-            showNotification(`Joc "${game.name}" afegit a la teva llista!`);
-        })
-        .catch(err => {
-            console.error("Error:", err);
-        });
+        }
+    });
 }
 
-function showNotification(message) {
-    const notif = document.getElementById("notification");
-    const msg = document.getElementById("notification-message");
-    msg.textContent = message;
-    notif.classList.remove("hidden");
-    setTimeout(() => notif.classList.add("hidden"), 3000);
-}
 
+/**
+ * Funció per actualitzar l'estat del joc
+ * @param {*} gameId 
+ * @param {*} status 
+ */
 function updateGameStatus(gameId, status) {
-    // Guardar en localStorage
     localStorage.setItem(`game-status-${gameId}`, status);
 
-    // Enviar al servidor
     fetch(`/game-list/${gameId}/status`, {
         method: 'PUT',
         headers: {
@@ -317,10 +369,23 @@ function updateGameStatus(gameId, status) {
         .then(res => res.json())
         .then(data => {
             console.log("Estat actualitzat", data);
-            showNotification("Estat actualitzat correctament ✅");
+            Swal.fire({
+                icon: 'success',
+                title: 'Estat actualitzat ✅',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#1e1e1e',
+                color: '#f0f0f0'
+            });
         });
 }
 
+
+/**
+ * Funció per actualitzar els comentaris
+ * @param {*} gameId 
+ * @param {*} comment 
+ */
 function updateGameComment(gameId, comment) {
     // Guardar en localStorage
     localStorage.setItem(`game-comment-${gameId}`, comment);
@@ -347,45 +412,73 @@ function updateGameComment(gameId, comment) {
         })
         .then(data => {
             console.log("Comentari guardat", data);
-            showNotification("Comentari guardat 📝");
         })
         .catch(err => {
             console.error("Error al guardar el comentari:", err);
-            showNotification("Error al guardar el comentari ⚠️");
         });
 }
 
+
+/**
+ * Funció per esborrar els jocs de la llista
+ * @param {*} gameId 
+ */
 function removeGameFromList(gameId) {
-    // Preguntar al usuario si está seguro de eliminar el juego
-    if (confirm("Estàs segur de voler eliminar aquest joc de la teva llista?")) {
-        fetch(`/game-list/${gameId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            }
-        })
-            .then(res => {
-                if (!res.ok) {
-                    return res.text().then(text => {
-                        if (text.startsWith("<!DOCTYPE")) {
-                            throw new Error("Error HTML (probable fallo en backend)");
-                        }
-                        throw new Error("Error: " + text);
-                    });
+    Swal.fire({
+        title: 'Estàs segur?',
+        text: "Aquest joc serà eliminat de la teva llista.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, elimina-ho!',
+        cancelButtonText: 'Cancel·la',
+        background: '#1e1e1e',
+        color: '#f0f0f0'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/game-list/${gameId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
                 }
-                return res.json();
             })
-            .then(data => {
-                console.log("Eliminat:", data);
-                fetchUserGameList();
-                showNotification("Joc eliminat correctament 🗑️");
-            })
-            .catch(err => {
-                console.error("Error al eliminar:", err);
-            });
-    } else {
-        console.log("Eliminació cancel·lada");
-    }
+                .then(res => {
+                    if (!res.ok) {
+                        return res.text().then(text => {
+                            if (text.startsWith("<!DOCTYPE")) {
+                                throw new Error("Error HTML (probable fallo en backend)");
+                            }
+                            throw new Error("Error: " + text);
+                        });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log("Eliminat:", data);
+                    fetchUserGameList();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Eliminat!',
+                        text: 'El joc ha estat eliminat correctament 🗑️',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        background: '#1e1e1e',
+                        color: '#f0f0f0'
+                    });
+                })
+                .catch(err => {
+                    console.error("Error al eliminar:", err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No s\'ha pogut eliminar el joc.',
+                        background: '#1e1e1e',
+                        color: '#f0f0f0'
+                    });
+                });
+        }
+    });
 }
