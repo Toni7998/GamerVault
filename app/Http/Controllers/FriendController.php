@@ -87,4 +87,32 @@ class FriendController extends Controller
 
         return back()->with('info', 'Solicitud rechazada');
     }
+
+    public function receivedRequests(): JsonResponse
+    {
+        $user = Auth::user();
+
+        $requests = Friendship::with('sender:id,name')
+            ->where('receiver_id', $user->id)
+            ->where('status', 'pending')
+            ->get();
+
+        return response()->json($requests);
+    }
+
+    public function removeFriend(User $user)
+    {
+        /** @var User $auth */
+        $auth = Auth::user();
+
+        Friendship::where(function ($query) use ($auth, $user) {
+            $query->where('sender_id', $auth->id)
+                ->where('receiver_id', $user->id);
+        })->orWhere(function ($query) use ($auth, $user) {
+            $query->where('sender_id', $user->id)
+                ->where('receiver_id', $auth->id);
+        })->delete();
+
+        return response()->json(['message' => 'Amic eliminat']);
+    }
 }

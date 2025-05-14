@@ -209,5 +209,14 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware('auth:sanctum')->post('/friends/request', [FriendController::class, 'sendRequest']);
 
 
+//  Rutas para recibir solicitudes de amistad
+Route::get('/friends/requests', [FriendController::class, 'receivedRequests']);
+Route::post('/friends/accept/{senderId}', [FriendController::class, 'acceptRequest']);
+Route::post('/friends/decline/{senderId}', [FriendController::class, 'declineRequest']);
+
+//  Ruta para borrar amigos
+Route::post('/friends/remove/{user}', [FriendController::class, 'removeFriend']);
+
+
 // Cargar rutas adicionales de autenticación (como las de login)
 require __DIR__ . '/auth.php';
