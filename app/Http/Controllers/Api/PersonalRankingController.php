@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Game;
 use Illuminate\Http\Request;
+use App\Models\GameRating;
+use Illuminate\Support\Facades\Auth;
 
 class PersonalRankingController extends Controller
 {
@@ -26,5 +28,35 @@ class PersonalRankingController extends Controller
         });
 
         return response()->json($games);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'game_id' => 'required|exists:games,id',
+            'rating' => 'required|numeric|min:0|max:5',
+        ]);
+
+        // Asegúrate de que el usuario esté autenticado
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'No autenticat'], 401);
+        }
+
+        // Guardar o actualizar valoración
+        $rating = GameRating::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'game_id' => $validated['game_id']
+            ],
+            [
+                'rating' => $validated['rating']
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Valoració guardada correctament',
+            'data' => $rating
+        ]);
     }
 }

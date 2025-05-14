@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container mx-auto px-4 py-8">
-    <h2 class="text-4xl font-bold mt-4 mb-4 text-center text-gray-800">💬 Rànquing personal</h2>
+    <h2 class="text-4xl font-bold mt-4 mb-4 text-center text-gray-800">💬 Rànquing Global</h2>
     <ul id="personal-ranking-list" class="game-ranking-list space-y-6"></ul>
 </div>
 
@@ -93,7 +93,11 @@
                         <div class="text-sm text-gray-600 space-y-1">
                             <p>🎮 <span class="font-medium">Plataformes:</span> ${game.platform}</p>
                             <p>📅 <span class="font-medium">Llançament:</span> ${game.released}</p>
-                            <p>⭐ <span class="font-medium">Valoració personal mitjana:</span> ${game.average_rating.toFixed(2)}/5</p>
+                            <p>⭐ <span class="font-medium">Valoració personal mitjana:</span> 
+${Number(game.average_rating) 
+    ? Number(game.average_rating).toFixed(2) + '/5' 
+    : 'Sense valoració'}</p>
+
                         </div>
                         <a href="https://rawg.io/games/${game.slug}" 
                             target="_blank" 
