@@ -8,7 +8,7 @@
 </div>
 
 <div class="container mx-auto px-4 py-8">
-    <h2 class="text-4xl font-bold mt-4 mb-4 text-center text-gray-800">🏆 Jocs més votats</h2>
+    <h2 class="text-4xl font-bold mt-4 mb-4 text-center text-gray-800">🏆 Jocs més votats segons RAWG</h2>
     <ul id="ranking-list" class="game-ranking-list space-y-6"></ul>
 </div>
 
@@ -93,10 +93,16 @@
                         <div class="text-sm text-gray-600 space-y-1">
                             <p>🎮 <span class="font-medium">Plataformes:</span> ${game.platform}</p>
                             <p>📅 <span class="font-medium">Llançament:</span> ${game.released}</p>
-                            <p>⭐ <span class="font-medium">Valoració personal mitjana:</span> 
-${Number(game.average_rating) 
-    ? Number(game.average_rating).toFixed(2) + '/5' 
-    : 'Sense valoració'}</p>
+                            <p>⭐ <span class="font-medium">Valoració mitjana global:</span> 
+${game.average_rating_global !== null 
+    ? Number(game.average_rating_global).toFixed(2) + '/5' 
+    : 'Sense valoració'}
+</p>
+<p>🙋 <span class="font-medium">La teva valoració:</span> 
+${game.user_rating !== null 
+    ? Number(game.user_rating).toFixed(2) + '/5' 
+    : 'Sense valorar'}
+</p>
 
                         </div>
                         <a href="https://rawg.io/games/${game.slug}" 
