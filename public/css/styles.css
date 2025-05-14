@@ -237,7 +237,7 @@ button {
 }
 
 /* Estilo de los elementos del ranking */
-#ranking-list li {
+.game-ranking-list li {
     background: #1e1e1e;
     border-radius: 14px;
     padding: 1rem;
@@ -251,12 +251,12 @@ button {
     transition: transform 0.3s ease-in-out;
 }
 
-#ranking-list li:hover {
+.game-ranking-list li:hover {
     transform: translateY(-5px);
     /* Sutil efecto de hover */
 }
 
-#ranking-list img {
+.game-ranking-list img {
     width: 120px;
     height: 80px;
     object-fit: cover;
@@ -264,19 +264,19 @@ button {
     flex-shrink: 0;
 }
 
-#ranking-list h3 {
+.game-ranking-list h3 {
     margin: 0;
     font-size: 1.2rem;
     color: #fff;
 }
 
-#ranking-list p {
+.game-ranking-list p {
     margin: 0.2rem 0;
     font-size: 0.875rem;
     color: #ccc;
 }
 
-#ranking-list a {
+.game-ranking-list a {
     margin-top: 0.4rem;
     display: inline-block;
     color: #b17bf7;
@@ -284,23 +284,22 @@ button {
     text-decoration: none;
 }
 
-#ranking-list a:hover {
+.game-ranking-list a:hover {
     text-decoration: underline;
 }
 
 /* Estilos para mayor adaptabilidad */
 @media (max-width: 600px) {
-    #ranking-list li {
+    .game-ranking-list li {
         flex-direction: column;
         align-items: center;
         text-align: center;
     }
 
-    #ranking-list img {
+    .game-ranking-list img {
         width: 100%;
         height: auto;
         margin-bottom: 1rem;
-        /* Espacio debajo de las imágenes en móviles */
     }
 }
 

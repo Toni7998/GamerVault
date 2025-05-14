@@ -9,15 +9,23 @@ class Game extends Model
     protected $fillable = [
         'id',
         'name',
+        'slug',  // Añadir slug al fillable
         'released',
         'background_image',
-        'platform',
+        'platform',  // Mantener el campo platform
         'completed',
         'game_list_id'
     ];
 
+    // Relación con la lista de juegos
     public function list()
     {
         return $this->belongsTo(GameList::class, 'game_list_id');
+    }
+
+    // Relación con las valoraciones de los juegos
+    public function ratings()
+    {
+        return $this->hasMany(GameRating::class, 'game_id');
     }
 }

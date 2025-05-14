@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\GameListController;
 use App\Http\Controllers\GameSearchController;
 use App\Http\Controllers\UserSearchController;
 use App\Http\Controllers\FriendController;
+use App\Http\Controllers\Api\PersonalRankingController;
 
 /*
 |----------------------------------------------------------------------
@@ -94,7 +95,7 @@ Route::get('/api/ranking', function () {
     $response = Http::get('https://api.rawg.io/api/games', [
         'key' => 'a6932e9255e64cf98bfa75abde510c5d',
         'ordering' => '-rating',
-        'page_size' => 21,
+        'page_size' => 6,
     ]);
 
     $games = $response->json()['results'];
@@ -217,6 +218,9 @@ Route::post('/friends/decline/{senderId}', [FriendController::class, 'declineReq
 //  Ruta para borrar amigos
 Route::post('/friends/remove/{user}', [FriendController::class, 'removeFriend']);
 
+// Ruta para la API de ranking personal
+Route::get('/api/personal-ranking', [PersonalRankingController::class, 'index']);
+Route::post('/api/personal-ranking', [PersonalRankingController::class, 'store']);
 
 // Cargar rutas adicionales de autenticación (como las de login)
 require __DIR__ . '/auth.php';

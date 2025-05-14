@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->date('released')->nullable();
             $table->string('background_image')->nullable();
+            $table->string('slug')->nullable(); // Agregamos la columna 'slug'
 
             // Relación con la lista
             $table->foreignId('game_list_id')->constrained()->onDelete('cascade');

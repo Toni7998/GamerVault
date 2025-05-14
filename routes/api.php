@@ -26,3 +26,7 @@ Route::get('/recommendations', function () {
 Route::middleware('auth')->get('/friends', [FriendController::class, 'index']);
 
 Route::get('/search-games', [GameSearchController::class, 'search']);
+
+use App\Http\Controllers\Api\PersonalRankingController;
+
+Route::get('personal-ranking', [PersonalRankingController::class, 'index']);

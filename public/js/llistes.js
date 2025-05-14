@@ -17,8 +17,6 @@ function fetchUserGameList() {
         }
     })
         .then(response => {
-
-            // Verifica la resposta
             console.log(response);
             if (!response.ok) {
                 return response.text().then(text => {
@@ -31,8 +29,6 @@ function fetchUserGameList() {
             return response.json();
         })
         .then(data => {
-
-            // Verifica les dades rebudes
             console.log("Llista de jocs:", data);
             renderGameList(data);
         })
@@ -53,7 +49,6 @@ function generateSlug(name) {
         .replace(/\s+/g, '-') // reemplazar espacios por guiones
         .replace(/-+/g, '-'); // evitar guiones duplicados
 }
-
 
 
 /**
@@ -124,11 +119,7 @@ function renderGameList(data) {
    class="text-blue-600 text-sm underline mt-2 hover:text-blue-800 text-center">
    🔗 Veure a RAWG
 </a>
-
-
-
     </div>
-
 
                 <div class="mt-2 text-xs text-gray-500 space-y-2">
 
@@ -201,6 +192,41 @@ function renderGameList(data) {
                 const gameId = e.target.closest('.star-rating').dataset.gameId;
                 localStorage.setItem(`game-rating-${gameId}`, selectedValue);
 
+                // Asegúrate de que el token CSRF está presente en el <meta> tag en tu HTML
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+                if (!csrfToken) {
+                    console.error("CSRF token no encontrado");
+                }
+
+                // Enviar al servidor el nuevo valor
+                fetch('/api/personal-ranking', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,  // Asegúrate de que el token CSRF sea válido
+                    },
+                    body: JSON.stringify({
+                        game_id: gameId,
+                        rating: selectedValue
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            // Si la respuesta no es 2xx, lanzamos un error
+                            throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+                        }
+                        return response.json(); // Intenta convertir la respuesta a JSON
+                    })
+                    .then(data => {
+                        console.log("Valoración enviada correctamente:", data);
+                        // Puedes manejar la respuesta aquí si es necesario
+                    })
+                    .catch(error => {
+                        console.error("Error al enviar la valoración:", error);
+                    });
+
+                // Actualizar las estrellas visualmente
                 const allStars = e.target.parentElement.querySelectorAll('span');
                 allStars.forEach((s, i) => {
                     const isFilled = i < selectedValue;
@@ -209,6 +235,7 @@ function renderGameList(data) {
                     s.classList.toggle('selected', isFilled);
                 });
             });
+
         });
 
         // Aplicar estrellas al iniciar
@@ -227,6 +254,7 @@ function renderGameList(data) {
     el.appendChild(gamesContainer);
     container.appendChild(el);
 }
+
 
 const searchInput = document.getElementById("search-input");
 let timeout;
@@ -356,6 +384,12 @@ function addGameToList(game) {
                         background: '#1e1e1e',
                         color: '#f0f0f0'
                     });
+
+                    localStorage.setItem(`game-name-${game.id}`, game.name);
+                    localStorage.setItem(`game-image-${game.id}`, game.background_image || '');
+                    localStorage.setItem(`game-slug-${game.id}`, game.slug || '');
+                    localStorage.setItem(`game-platforms-${game.id}`, game.platforms?.map(p => p.platform.name).join(', ') || '');
+                    localStorage.setItem(`game-released-${game.id}`, game.released || '');
                 })
                 .catch(err => {
                     console.error("Error:", err);
