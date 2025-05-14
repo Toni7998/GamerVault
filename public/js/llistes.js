@@ -19,7 +19,7 @@ function fetchUserGameList() {
         .then(response => {
 
             // Verifica la resposta
-            console.log(response); 
+            console.log(response);
             if (!response.ok) {
                 return response.text().then(text => {
                     if (text.startsWith("<!DOCTYPE")) {
@@ -33,7 +33,7 @@ function fetchUserGameList() {
         .then(data => {
 
             // Verifica les dades rebudes
-            console.log("Llista de jocs:", data); 
+            console.log("Llista de jocs:", data);
             renderGameList(data);
         })
         .catch(error => {
@@ -42,6 +42,19 @@ function fetchUserGameList() {
             container.innerHTML = "<p class='text-red-500 text-center col-span-4'>No s'ha pogut carregar la llista. 😢</p>";
         });
 }
+
+
+function generateSlug(name) {
+    return name
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quitar acentos
+        .replace(/[^a-z0-9\s-]/g, '') // quitar símbolos no alfanuméricos
+        .trim()
+        .replace(/\s+/g, '-') // reemplazar espacios por guiones
+        .replace(/-+/g, '-'); // evitar guiones duplicados
+}
+
+
 
 /**
  * Funció per mostrar la llista
@@ -85,7 +98,7 @@ function renderGameList(data) {
         gameCard.classList.add(
             "game-card",
             "flex",
-            "gap-4",
+            "flex-col",
             "p-4",
             "mb-4",
             "bg-gray-100",
@@ -103,51 +116,65 @@ function renderGameList(data) {
         const savedTimesFinished = localStorage.getItem(`game-times-finished-${game.id}`) || 0;
 
         gameCard.innerHTML = `
-            <img src="${game.background_image || 'https://via.placeholder.com/150x150?text=Sense+imatge'}"
-     alt="${game.name}" class="w-40 h-40 object-cover rounded shadow">
-<div class="flex-1">
+    <div class="flex flex-col items-center">
+        <img src="${game.background_image || 'https://via.placeholder.com/150x150?text=Sense+imatge'}"
+             alt="${game.name}" class="w-40 h-40 object-cover rounded shadow">
 
-                <h4 class="font-semibold text-lg mb-1">${game.name}</h4>
-                <div class="mt-2 text-xs text-gray-500 space-y-1">
-                    <label class="block mt-2 text-gray-700">
-                        Estat:
-                        <select data-game-id="${game.id}" class="status-selector mt-1 p-1 rounded border">
-                            <option value="pendiente" ${savedStatus === "pendiente" ? "selected" : game.status === "pendiente" ? "selected" : ""}>🎯 Pendent</option>
-                            <option value="jugando" ${savedStatus === "jugando" ? "selected" : game.status === "jugando" ? "selected" : ""}>🎮 Jugant</option>
-                            <option value="completado" ${savedStatus === "completado" ? "selected" : game.status === "completado" ? "selected" : ""}>✅ Completat</option>
-                        </select>
-                    </label>
+        <a href="https://rawg.io/games/${generateSlug(game.name)}" target="_blank"
+   class="text-blue-600 text-sm underline mt-2 hover:text-blue-800 text-center">
+   🔗 Veure a RAWG
+</a>
 
-                    <label class="block mt-2 text-gray-700">Valoració personal:</label>
-                    <div class="star-rating flex space-x-1 mt-1 mb-2 justify-center" data-game-id="${game.id}">
+
+
+    </div>
+
+
+                <div class="mt-2 text-xs text-gray-500 space-y-2">
+
+                    <h4 class="font-semibold text-lg mt-2 text-center">${game.name}</h4>
+
+                <label class="block text-gray-700">
+                    Estat:
+                    <select data-game-id="${game.id}" class="status-selector mt-1 p-1 rounded border w-full">
+                        <option value="pendiente" ${savedStatus === "pendiente" ? "selected" : game.status === "pendiente" ? "selected" : ""}>🎯 Pendent</option>
+                        <option value="jugando" ${savedStatus === "jugando" ? "selected" : game.status === "jugando" ? "selected" : ""}>🎮 Jugant</option>
+                        <option value="completado" ${savedStatus === "completado" ? "selected" : game.status === "completado" ? "selected" : ""}>✅ Completat</option>
+                    </select>
+                </label>
+
+                <label class="block text-gray-700">
+                    Valoració personal:
+                    <div class="star-rating flex justify-center space-x-1 mt-1" data-game-id="${game.id}">
                         ${Array.from({ length: 5 }, (_, i) => {
             const value = i + 1;
             const filled = savedRating >= value ? 'text-yellow-400' : 'text-gray-300';
             return `<span data-value="${value}" class="cursor-pointer text-2xl ${filled}">★</span>`;
         }).join('')}
                     </div>
+                </label>
 
-                    <label class="block mt-2 text-gray-700">
-                        Vegades completat:
-                        <input type="number" min="0" value="${savedTimesFinished}" 
-                               data-game-id="${game.id}" class="times-finished mt-1 p-1 rounded border w-full">
-                    </label>
-                </div>
+                <label class="block text-gray-700">
+                    Vegades completat:
+                    <input type="number" min="0" value="${savedTimesFinished}"
+                           data-game-id="${game.id}" class="times-finished mt-1 p-1 rounded border w-full">
+                </label>
 
-                <label class="block mt-2 text-gray-700">
+                <label class="block text-gray-700">
                     Comentaris:
                     <textarea data-game-id="${game.id}" class="comment-box mt-1 p-1 w-full rounded border" rows="2"
                               placeholder="Escriu una nota...">${savedComment || game.comment || ''}</textarea>
                 </label>
-                
-                <br>
-                <button data-game-id="${game.id}" class="remove-game delete-button bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
-    🗑️
-</button>
 
+                            <button data-game-id="${game.id}" class="remove-game delete-button bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded mt-4 self-center">
+                🗑️
+            </button>
             </div>
+
+
         `;
 
+        // Eventos
         gameCard.querySelector('.status-selector').addEventListener('change', e => {
             const gameId = e.target.dataset.gameId;
             updateGameStatus(gameId, e.target.value);
@@ -165,19 +192,15 @@ function renderGameList(data) {
 
         gameCard.querySelector('.times-finished').addEventListener('blur', e => {
             const gameId = e.target.dataset.gameId;
-            const timesFinished = e.target.value;
-            localStorage.setItem(`game-times-finished-${gameId}`, timesFinished); // Guardar el valor actualizado
+            localStorage.setItem(`game-times-finished-${gameId}`, e.target.value);
         });
 
         gameCard.querySelectorAll('.star-rating span').forEach(star => {
             star.addEventListener('click', e => {
                 const selectedValue = parseInt(e.target.dataset.value);
                 const gameId = e.target.closest('.star-rating').dataset.gameId;
-
-                // Guardar la valoración en localStorage
                 localStorage.setItem(`game-rating-${gameId}`, selectedValue);
 
-                // Actualizar todas las estrellas
                 const allStars = e.target.parentElement.querySelectorAll('span');
                 allStars.forEach((s, i) => {
                     const isFilled = i < selectedValue;
@@ -188,14 +211,13 @@ function renderGameList(data) {
             });
         });
 
-        // Recuperar la valoración guardada y aplicar la clase correcta en la carga inicial
-        const initialRating = localStorage.getItem(`game-rating-${game.id}`);
-        if (initialRating) {
+        // Aplicar estrellas al iniciar
+        if (savedRating) {
             const allStars = gameCard.querySelectorAll('.star-rating span');
             allStars.forEach((star, i) => {
-                const ratingValue = parseInt(initialRating);
-                star.classList.toggle('text-yellow-400', i < ratingValue); // Aplicar amarillo
-                star.classList.toggle('text-gray-300', i >= ratingValue); // Aplicar gris
+                const ratingValue = parseInt(savedRating);
+                star.classList.toggle('text-yellow-400', i < ratingValue);
+                star.classList.toggle('text-gray-300', i >= ratingValue);
             });
         }
 

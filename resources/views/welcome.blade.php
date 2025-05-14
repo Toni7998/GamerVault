@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>GamerVault</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/welcome.css') }}">
 </head>
 
 <body>
@@ -84,9 +84,9 @@
                 </div>
             </div>
         </section>
-        
+
         <br>
-        
+
         <section class="mt-20 fade-in">
             <h2 class="text-3xl font-bold mb-6 text-center">Top del ranking</h2>
             <div class="relative">
