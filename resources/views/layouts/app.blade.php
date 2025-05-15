@@ -11,20 +11,19 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 
     <style>
-        html,
-        body {
+        html {
             height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            /* Previene el scroll horizontal */
         }
 
         body {
+            min-height: 100%;
             display: flex;
             flex-direction: column;
-            min-width: 100vw;
-            /* Asegura que el body ocupe exactamente el ancho de la ventana */
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+            /* Añadido para el contexto de posición */
         }
 
         main {
@@ -32,9 +31,22 @@
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
-            /* Incluye padding en el cálculo del ancho */
+            padding-bottom: 1rem;
+            /* Espacio antes del footer */
         }
 
+
+
+        /* Ajustes específicos para SweetAlert */
+        .swal2-container {
+            z-index: 10000 !important;
+            /* Asegura que el modal esté por encima de todo */
+            position: fixed !important;
+        }
+
+        .swal2-popup {
+            margin: auto !important;
+        }
     </style>
 </head>
 
@@ -70,19 +82,18 @@
 
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <div class="container mx-auto">
-                <p>&copy; 2025 GamerVault. Tots els drets reservats.</p>
-                <div class="mt-4">
-                    <a href="{{ route('privacy-policy') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Política de Privacitat</a>|
-                    <a href="{{ route('terms-of-service') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Condicions d'ús</a>|
-                    <a href="mailto:antonio.ruiz@insbaixcamp.cat" class="text-yellow-400 hover:text-yellow-500 mx-2">Contacta'ns</a>
-                </div>
-                <div class="mt-4">
-                    <a href="https://twitter.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Twitter</a>
-                    <a href="https://facebook.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Facebook</a>
-                </div>
+        <div class="container mx-auto">
+            <p>&copy; 2025 GamerVault. Tots els drets reservats.</p>
+            <div class="mt-4">
+                <a href="{{ route('privacy-policy') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Política de Privacitat</a>|
+                <a href="{{ route('terms-of-service') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Condicions d'ús</a>|
+                <a href="mailto:antonio.ruiz@insbaixcamp.cat" class="text-yellow-400 hover:text-yellow-500 mx-2">Contacta'ns</a>
             </div>
+            <div class="mt-4">
+                <a href="https://twitter.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Twitter</a>
+                <a href="https://facebook.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Facebook</a>
+            </div>
+        </div>
     </footer>
 
 </body>
