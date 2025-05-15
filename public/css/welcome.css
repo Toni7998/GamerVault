@@ -504,15 +504,75 @@ footer {
     gap: 1rem;
 }
 
-/* Chat*/
+/* Chat */
 textarea {
     resize: vertical;
+    border: 1px solid #444;
+    background-color: #121212;
+    color: #e0e0e0;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    transition: border 0.3s ease;
 }
 
+textarea:focus {
+    border-color: #7e22ce;
+    /* morado brillante */
+    outline: none;
+    background-color: #181818;
+}
+
+/* Colores de fondo más definidos */
 .bg-gray-800 {
-    background-color: #2d2d2d;
+    background-color: #2b2b2b;
 }
 
 .bg-gray-900 {
-    background-color: #1f1f1f;
+    background-color: #1c1c1c;
+}
+
+/* Tarjetas de post */
+.posts>div {
+    border-left: 4px solid #7e22ce;
+    /* acento visual */
+    padding-left: 1rem;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.posts>div:hover {
+    background-color: #333333;
+}
+
+/* Nombre y fecha */
+.posts p.text-sm {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-bottom: 0.3rem;
+}
+
+/* Botón enviar */
+.post-form button {
+    background: linear-gradient(135deg, #7e22ce, #a855f7);
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 6px rgba(126, 34, 206, 0.4);
+}
+
+.post-form button:hover {
+    background: linear-gradient(135deg, #9333ea, #c084fc);
+    transform: translateY(-1px);
+}
+
+/* Formulari */
+.post-form {
+    border-top: 1px solid #333;
+    padding-top: 1rem;
+    margin-top: 2rem;
+}
+
+/* Text d'avís login */
+.text-gray-400 a:hover {
+    color: #c084fc;
+    text-decoration: underline;
 }

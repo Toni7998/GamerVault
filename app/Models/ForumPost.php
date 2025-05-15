@@ -9,11 +9,11 @@ class ForumPost extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['content', 'user_id', 'forum_thread_id'];
+    protected $fillable = ['content', 'user_id', 'thread_id'];
 
     public function thread()
     {
-        return $this->belongsTo(ForumThread::class, 'forum_thread_id');
+        return $this->belongsTo(ForumThread::class, 'thread_id');
     }
 
     public function user()

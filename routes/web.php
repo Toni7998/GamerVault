@@ -28,8 +28,8 @@ use App\Models\ForumThread;
 
 // Ruta principal de bienvenida
 Route::get('/', function () {
-    $threads = ForumThread::with('posts.user')->latest()->get();
-    return view('welcome', compact('threads'));
+    $thread = ForumThread::with('posts.user')->where('title', 'General')->first();
+    return view('welcome', compact('thread'));
 });
 
 

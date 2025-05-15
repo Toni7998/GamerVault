@@ -77,7 +77,7 @@
         <div class="max-w-4xl mx-auto">
             <h1 class="text-3xl font-bold mb-4">💬 Fòrum GamerVault</h1>
 
-            @foreach($threads as $thread)
+            @if($thread)
             <div class="bg-gray-900 text-white p-4 rounded-lg shadow mb-6" id="thread-{{ $thread->id }}">
                 <h2 class="text-xl font-semibold">{{ $thread->title }}</h2>
                 <div class="space-y-3 mt-4 posts" id="posts-thread-{{ $thread->id }}">
@@ -89,13 +89,20 @@
                     @endforeach
                 </div>
 
+                @auth
                 <form class="post-form mt-4" data-thread-id="{{ $thread->id }}">
                     @csrf
                     <textarea name="content" rows="2" class="w-full p-2 rounded text-black" placeholder="Escriu un missatge..." required></textarea>
                     <button class="mt-2 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700" type="submit">Enviar</button>
                 </form>
+                @else
+                <p class="text-gray-400 mt-4">Has de <a href="{{ route('login') }}" class="text-purple-500 underline">iniciar sessió</a> per poder escriure missatges.</p>
+                @endauth
+
             </div>
-            @endforeach
+            @else
+            <p class="text-white">No s'ha trobat el fil del fòrum general.</p>
+            @endif
         </div>
 
         <br>
