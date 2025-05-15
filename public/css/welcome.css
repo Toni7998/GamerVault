@@ -503,3 +503,16 @@ footer {
     flex-direction: column;
     gap: 1rem;
 }
+
+/* Chat*/
+textarea {
+    resize: vertical;
+}
+
+.bg-gray-800 {
+    background-color: #2d2d2d;
+}
+
+.bg-gray-900 {
+    background-color: #1f1f1f;
+}

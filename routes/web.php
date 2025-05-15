@@ -12,6 +12,8 @@ use App\Http\Controllers\GameSearchController;
 use App\Http\Controllers\UserSearchController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\Api\PersonalRankingController;
+use App\Http\Controllers\ForumController;
+use App\Models\ForumThread;
 
 /*
 |----------------------------------------------------------------------
@@ -26,7 +28,8 @@ use App\Http\Controllers\Api\PersonalRankingController;
 
 // Ruta principal de bienvenida
 Route::get('/', function () {
-    return view('welcome');
+    $threads = ForumThread::with('posts.user')->latest()->get();
+    return view('welcome', compact('threads'));
 });
 
 
@@ -221,6 +224,22 @@ Route::post('/friends/remove/{user}', [FriendController::class, 'removeFriend'])
 // Ruta para la API de ranking personal
 Route::get('/api/personal-ranking', [PersonalRankingController::class, 'index']);
 Route::post('/api/personal-ranking', [PersonalRankingController::class, 'store']);
+
+
+//  Ruta del chat
+Route::middleware(['auth'])->group(function () {
+    Route::get('/forum', [ForumController::class, 'index'])->name('forum.index');
+    Route::post('/forum/thread/{thread}/post', [ForumController::class, 'storePost'])->name('forum.post');
+});
+
+
+// Mostrar los posts de un hilo en JSON (para AJAX)
+Route::get('/forum/{thread}/posts', [ForumController::class, 'getPosts']);
+
+
+// Guardar post nuevo (ya tienes storePost, solo que debe aceptar JSON)
+Route::post('/forum/{thread}/posts', [ForumController::class, 'storePost'])->middleware('auth');
+
 
 // Cargar rutas adicionales de autenticación (como las de login)
 require __DIR__ . '/auth.php';

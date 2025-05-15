@@ -74,6 +74,30 @@
             </div>
         </div>
 
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold mb-4">💬 Fòrum GamerVault</h1>
+
+            @foreach($threads as $thread)
+            <div class="bg-gray-900 text-white p-4 rounded-lg shadow mb-6" id="thread-{{ $thread->id }}">
+                <h2 class="text-xl font-semibold">{{ $thread->title }}</h2>
+                <div class="space-y-3 mt-4 posts" id="posts-thread-{{ $thread->id }}">
+                    @foreach($thread->posts as $post)
+                    <div class="bg-gray-800 p-3 rounded">
+                        <p class="text-sm text-gray-400">{{ $post->user->name }} - {{ $post->created_at->diffForHumans() }}</p>
+                        <p>{{ $post->content }}</p>
+                    </div>
+                    @endforeach
+                </div>
+
+                <form class="post-form mt-4" data-thread-id="{{ $thread->id }}">
+                    @csrf
+                    <textarea name="content" rows="2" class="w-full p-2 rounded text-black" placeholder="Escriu un missatge..." required></textarea>
+                    <button class="mt-2 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700" type="submit">Enviar</button>
+                </form>
+            </div>
+            @endforeach
+        </div>
+
         <br>
 
         <section class="mt-20 fade-in">
@@ -105,6 +129,8 @@
         </section>
     </main>
 
+    <!-- Incluye tu JS modular del foro -->
+    <script src="{{ asset('js/forum-chat.js') }}"></script>
 </body>
 
 <footer class="bg-gray-800 text-white text-center py-6 mt-10">
