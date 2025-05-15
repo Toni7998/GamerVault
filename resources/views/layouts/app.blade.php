@@ -9,6 +9,33 @@
     <title>GamerVault - @yield('title', 'Inici')</title>
 
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            /* Previene el scroll horizontal */
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-width: 100vw;
+            /* Asegura que el body ocupe exactamente el ancho de la ventana */
+        }
+
+        main {
+            flex: 1 0 auto;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            /* Incluye padding en el cálculo del ancho */
+        }
+
+    </style>
 </head>
 
 <body class="font-sans bg-gray-50 text-gray-800">
@@ -42,19 +69,20 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white text-center py-6 mt-10">
-        <div class="container mx-auto">
-            <p>&copy; 2025 GamerVault. Tots els drets reservats.</p>
-            <div class="mt-4">
-                <a href="{{ route('privacy-policy') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Política de Privacitat</a>|
-                <a href="{{ route('terms-of-service') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Condicions d'ús</a>|
-                <a href="mailto:antonio.ruiz@insbaixcamp.cat" class="text-yellow-400 hover:text-yellow-500 mx-2">Contacta'ns</a>
+    <footer>
+        <div class="container">
+            <div class="container mx-auto">
+                <p>&copy; 2025 GamerVault. Tots els drets reservats.</p>
+                <div class="mt-4">
+                    <a href="{{ route('privacy-policy') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Política de Privacitat</a>|
+                    <a href="{{ route('terms-of-service') }}" class="text-yellow-400 hover:text-yellow-500 mx-2">Condicions d'ús</a>|
+                    <a href="mailto:antonio.ruiz@insbaixcamp.cat" class="text-yellow-400 hover:text-yellow-500 mx-2">Contacta'ns</a>
+                </div>
+                <div class="mt-4">
+                    <a href="https://twitter.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Twitter</a>
+                    <a href="https://facebook.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Facebook</a>
+                </div>
             </div>
-            <div class="mt-4">
-                <a href="https://twitter.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Twitter</a>
-                <a href="https://facebook.com/gamervault" class="text-yellow-400 hover:text-yellow-500 mx-2" target="_blank">Facebook</a>
-            </div>
-        </div>
     </footer>
 
 </body>
