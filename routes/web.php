@@ -14,6 +14,8 @@ use App\Http\Controllers\FriendController;
 use App\Http\Controllers\Api\PersonalRankingController;
 use App\Http\Controllers\ForumController;
 use App\Models\ForumThread;
+use App\Http\Controllers\UserGameController;
+use Illuminate\Http\Request;
 
 /*
 |----------------------------------------------------------------------
@@ -242,6 +244,11 @@ Route::post('/forum/{thread}/posts', [ForumController::class, 'storePost'])->mid
 
 //  Conseguir ruta de la api de RAWG
 Route::get('/api/rawg/details/{id}', [\App\Http\Controllers\RawgController::class, 'getGameDetails']);
+
+//  Ruta para los comentarios
+Route::post('/test-update', function (Request $request) {
+    return response()->json(['success' => true]);
+});
 
 // Cargar rutas adicionales de autenticación (como las de login)
 require __DIR__ . '/auth.php';

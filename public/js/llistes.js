@@ -454,34 +454,25 @@ function updateGameStatus(gameId, status) {
  * @param {*} comment 
  */
 function updateGameComment(gameId, comment) {
-    // Guardar en localStorage
-    localStorage.setItem(`game-comment-${gameId}`, comment);
-
-    fetch(`/game-list/${gameId}/comment`, {
-        method: 'PUT',
+    fetch('/test-update', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json'
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         },
-        body: JSON.stringify({ comment })
+        body: JSON.stringify({ test: true })
     })
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => {
-                    if (text.startsWith("<!DOCTYPE")) {
-                        throw new Error("Error HTML (probable fallo en backend)");
-                    }
-                    throw new Error("Error: " + text);
-                });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al guardar el comentari");
             }
-            return res.json();
+            return response.json();
         })
         .then(data => {
-            console.log("Comentari guardat", data);
+            console.log("Comentari actualitzat:", data);
         })
-        .catch(err => {
-            console.error("Error al guardar el comentari:", err);
+        .catch(error => {
+            console.error("Error al guardar el comentari", error);
         });
 }
 

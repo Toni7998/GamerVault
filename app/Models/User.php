@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\GameList;
 use App\Models\Friendship;
 use Illuminate\Support\Facades\DB;
+use App\Models\UserGame;
 
 class User extends Authenticatable
 {
@@ -117,4 +118,10 @@ class User extends Authenticatable
 
         return $sent->union($received);
     }
+
+    public function userGames()
+    {
+        return $this->hasMany(UserGame::class);
+    }
+
 }
