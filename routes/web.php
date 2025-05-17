@@ -240,6 +240,8 @@ Route::get('/forum/{thread}/posts', [ForumController::class, 'getPosts']);
 // Guardar post nuevo (ya tienes storePost, solo que debe aceptar JSON)
 Route::post('/forum/{thread}/posts', [ForumController::class, 'storePost'])->middleware('auth');
 
+//  Conseguir ruta de la api de RAWG
+Route::get('/api/rawg/details/{id}', [\App\Http\Controllers\RawgController::class, 'getGameDetails']);
 
 // Cargar rutas adicionales de autenticación (como las de login)
 require __DIR__ . '/auth.php';

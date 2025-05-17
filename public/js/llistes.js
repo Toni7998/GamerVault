@@ -39,18 +39,6 @@ function fetchUserGameList() {
         });
 }
 
-
-function generateSlug(name) {
-    return name
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quitar acentos
-        .replace(/[^a-z0-9\s-]/g, '') // quitar símbolos no alfanuméricos
-        .trim()
-        .replace(/\s+/g, '-') // reemplazar espacios por guiones
-        .replace(/-+/g, '-'); // evitar guiones duplicados
-}
-
-
 /**
  * Funció per mostrar la llista
  * @param {*} data 
@@ -115,10 +103,11 @@ function renderGameList(data) {
         <img src="${game.background_image || 'https://via.placeholder.com/150x150?text=Sense+imatge'}"
              alt="${game.name}" class="w-40 h-40 object-cover rounded shadow">
 
-        <a href="https://rawg.io/games/${generateSlug(game.name)}" target="_blank"
+        <a href="https://rawg.io/games/${game.id}" target="_blank"
    class="text-blue-600 text-sm underline mt-2 hover:text-blue-800 text-center">
    🔗 Veure a RAWG
 </a>
+
     </div>
 
                 <div class="mt-2 text-xs text-gray-500 space-y-2">
@@ -338,8 +327,8 @@ function renderSearchResults(games) {
  * Funció per afegir els jocs a la llista
  * @param {*} game 
  */
-function addGameToList(game) {
-    Swal.fire({
+async function addGameToList(game) {
+    const result = await Swal.fire({
         title: 'Afegir joc a la llista?',
         text: `Vols afegir "${game.name}" a la teva llista?`,
         icon: 'question',
@@ -350,60 +339,82 @@ function addGameToList(game) {
         color: '#f0f0f0',
         confirmButtonColor: '#4caf50',
         cancelButtonColor: '#f44336'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch('/game-list', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify(game)
-            })
-                .then(res => {
-                    if (!res.ok) {
-                        return res.text().then(text => {
-                            if (text.startsWith("<!DOCTYPE")) {
-                                throw new Error("Error: S'ha rebut una pàgina HTML en lloc de JSON.");
-                            }
-                            throw new Error("Error al afegir el joc: " + text);
-                        });
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    console.log("Joc afegit:", data);
-                    fetchUserGameList();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Afegit!',
-                        text: `El joc "${game.name}" ha estat afegit a la teva llista!`,
-                        timer: 2000,
-                        showConfirmButton: false,
-                        background: '#1e1e1e',
-                        color: '#f0f0f0'
-                    });
-
-                    localStorage.setItem(`game-name-${game.id}`, game.name);
-                    localStorage.setItem(`game-image-${game.id}`, game.background_image || '');
-                    localStorage.setItem(`game-slug-${game.id}`, game.slug || '');
-                    localStorage.setItem(`game-platforms-${game.id}`, game.platforms?.map(p => p.platform.name).join(', ') || '');
-                    localStorage.setItem(`game-released-${game.id}`, game.released || '');
-                })
-                .catch(err => {
-                    console.error("Error:", err);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: err.message,
-                        background: '#1e1e1e',
-                        color: '#f0f0f0'
-                    });
-                });
-        }
     });
+
+    if (!result.isConfirmed) return;
+
+    // Pantalla de càrrega
+    Swal.fire({
+        title: 'Afegint joc...',
+        html: 'Espera mentre es comprova la informació i s’afegeix el joc.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        background: '#1e1e1e',
+        color: '#f0f0f0'
+    });
+
+    try {
+        // PAS 1: Obtenir dades extres del joc des de RAWG
+        const rawgResponse = await fetch(`/api/rawg/details/${game.id}`);
+        if (!rawgResponse.ok) {
+            throw new Error("No s'han pogut obtenir detalls del joc des de RAWG.");
+        }
+        const detailedGame = await rawgResponse.json();
+
+        // PAS 2: Enviar a la teva BD
+        const postResponse = await fetch('/game-list', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(detailedGame)
+        });
+
+        if (!postResponse.ok) {
+            const text = await postResponse.text();
+            if (text.startsWith("<!DOCTYPE")) {
+                throw new Error("Error: S'ha rebut una pàgina HTML en lloc de JSON.");
+            }
+            throw new Error("Error al afegir el joc: " + text);
+        }
+
+        const data = await postResponse.json();
+
+        // Refrescar llista
+        await fetchUserGameList();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Afegit!',
+            text: `El joc "${detailedGame.name}" ha estat afegit a la teva llista!`,
+            timer: 2000,
+            showConfirmButton: false,
+            background: '#1e1e1e',
+            color: '#f0f0f0'
+        });
+
+        // Guarda info bàsica localment
+        localStorage.setItem(`game-name-${game.id}`, game.name);
+        localStorage.setItem(`game-image-${game.id}`, game.background_image || '');
+        localStorage.setItem(`game-platforms-${game.id}`, game.platforms?.map(p => p.platform.name).join(', ') || '');
+        localStorage.setItem(`game-released-${game.id}`, game.released || '');
+
+    } catch (err) {
+        console.error("Error afegint joc:", err);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: err.message || 'Hi ha hagut un problema afegint el joc.',
+            background: '#1e1e1e',
+            color: '#f0f0f0'
+        });
+    }
 }
+
 
 
 /**

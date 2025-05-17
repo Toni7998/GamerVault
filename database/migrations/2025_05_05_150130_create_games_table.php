@@ -16,16 +16,16 @@ return new class extends Migration
             $table->string('name');
             $table->date('released')->nullable();
             $table->string('background_image')->nullable();
-            $table->string('slug')->nullable(); // Agregamos la columna 'slug'
+            $table->string('slug')->nullable();
+            $table->string('website_url')->nullable(); 
 
             // Relación con la lista
             $table->foreignId('game_list_id')->constrained()->onDelete('cascade');
 
-            // Opcionales para tu app
+            // Opcionales per la app
             $table->string('platform')->nullable();
             $table->boolean('completed')->default(false);
-
-            $table->text('comment')->nullable(); // Agrega la columna 'comment' como texto
+            $table->text('comment')->nullable();
 
             $table->timestamps();
         });
