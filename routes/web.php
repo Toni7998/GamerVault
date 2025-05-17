@@ -17,6 +17,9 @@ use App\Models\ForumThread;
 use Illuminate\Http\Request;
 use App\Models\Game;
 use App\Models\GameRating;
+use App\Models\Friendship;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\RecommendationController;
 
 /*
 |----------------------------------------------------------------------
@@ -69,6 +72,7 @@ Route::middleware('auth')->group(function () {
     // Otras vistas protegidas por autenticación
     Route::view('/recomanacions', 'pages.recomanacions')->name('recomanacions');
     Route::view('/ranking', 'pages.ranking')->name('ranking');
+    Route::get('/friends/status/{userId}', [FriendController::class, 'status'])->name('friends.status');
 });
 
 
@@ -226,6 +230,77 @@ Route::get('/api/recommendations', function () {
 });
 
 
+Route::get('/api/recommendations/friends', function () {
+    $user = Auth::user();
+    if (!$user) return response()->json([], 401);
+
+    $RAWG_API_KEY = 'a6932e9255e64cf98bfa75abde510c5d';
+
+    // 1. Obtener IDs de amigos (supongo tienes un modelo Friendship o similar)
+    // Aquí debes ajustar según tu modelo de amistades
+    $friendIds = Friendship::where(function ($q) use ($user) {
+        $q->where('sender_id', $user->id)
+            ->orWhere('receiver_id', $user->id);
+    })->where('status', 'accepted')
+        ->get()
+        ->map(function ($f) use ($user) {
+            return $f->sender_id == $user->id ? $f->receiver_id : $f->sender_id;
+        })->toArray();
+
+    if (empty($friendIds)) {
+        return response()->json([
+            'message' => 'No tens amics amb recomanacions disponibles.'
+        ], 200);
+    }
+
+    // 2. Juegos que usuario ya valoró para excluir
+    $excludedIds = GameRating::where('user_id', $user->id)->pluck('game_id')->toArray();
+
+    // 3. Obtener juegos valorados por amigos con nota >= 4
+    $friendsLikedRatings = GameRating::whereIn('user_id', $friendIds)
+        ->where('rating', '>=', 4)
+        ->whereNotIn('game_id', $excludedIds)
+        ->with('game') // si tienes relación para acceder al juego
+        ->get();
+
+    if ($friendsLikedRatings->isEmpty()) {
+        return response()->json([
+            'message' => 'Els teus amics no han valorat cap joc per recomanar-te.'
+        ], 200);
+    }
+
+    // 4. Contar cuántos amigos recomiendan cada juego para ordenar por popularidad
+    $recommendationCounts = [];
+    foreach ($friendsLikedRatings as $rating) {
+        $id = $rating->game_id;
+        if (!isset($recommendationCounts[$id])) {
+            $recommendationCounts[$id] = [
+                'count' => 0,
+                'game' => $rating->game,
+            ];
+        }
+        $recommendationCounts[$id]['count']++;
+    }
+
+    // Ordenar juegos por número de amigos que los recomendaron (desc)
+    usort($recommendationCounts, function ($a, $b) {
+        return $b['count'] <=> $a['count'];
+    });
+
+    // Preparar respuesta, máximo 10 juegos
+    $recommendations = [];
+    foreach ($recommendationCounts as $rec) {
+        $recommendations[] = [
+            'sender' => "👥 Recomanat pels teus amics",
+            'game' => $rec['game']->name,
+        ];
+        if (count($recommendations) >= 10) break;
+    }
+
+    return response()->json($recommendations);
+});
+
+
 // 📩 Ruta para mostrar y enviar el formulario de contacto
 Route::get('/contacte', [ContactController::class, 'create'])->name('contacte');
 Route::post('/contacte', [ContactController::class, 'store']);
@@ -313,6 +388,18 @@ Route::get('/api/rawg/details/{id}', [\App\Http\Controllers\RawgController::clas
 Route::post('/test-update', function (Request $request) {
     return response()->json(['success' => true]);
 });
+
+
+Route::middleware('auth')->post('/recommend-game', [RecommendationController::class, 'recommend'])->name('recommend.game');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/recommend-game', [RecommendationController::class, 'recommend']);
+    Route::get('/received-recommendations', [RecommendationController::class, 'getReceivedRecommendations']);
+});
+
+Route::delete('/api/recommendations/{id}', [RecommendationController::class, 'destroy']);
+
+Route::middleware('auth')->get('/api/received-recommendations', [RecommendationController::class, 'received']);
 
 // Cargar rutas adicionales de autenticación (como las de login)
 require __DIR__ . '/auth.php';

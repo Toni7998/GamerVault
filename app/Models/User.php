@@ -81,8 +81,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'friendships', 'sender_id', 'receiver_id')
             ->wherePivot('status', 'accepted')
-            ->withPivot('created_at', 'updated_at')
-            ->withTimestamps();
+            ->withPivot('status');
     }
 
     /**
@@ -90,33 +89,23 @@ class User extends Authenticatable
      */
     public function allFriends()
     {
-        $userId = $this->id;
+        return User::whereIn('id', function ($query) {
+            $query->selectRaw('CASE 
+                WHEN sender_id = ? THEN receiver_id 
+                ELSE sender_id 
+            END', [$this->id])
+                ->from('friendships')
+                ->where(function ($q) {
+                    $q->where('sender_id', $this->id)
+                        ->orWhere('receiver_id', $this->id);
+                })
+                ->where('status', 'accepted');
+        });
+    }
 
-        $sent = DB::table('users')
-            ->join('friendships', 'users.id', '=', 'friendships.receiver_id')
-            ->where('friendships.sender_id', $userId)
-            ->where('friendships.status', 'accepted')
-            ->select(
-                'users.id',
-                'users.name',
-                'users.email',
-                'friendships.sender_id as pivot_sender_id',
-                'friendships.receiver_id as pivot_receiver_id'
-            );
-
-        $received = DB::table('users')
-            ->join('friendships', 'users.id', '=', 'friendships.sender_id')
-            ->where('friendships.receiver_id', $userId)
-            ->where('friendships.status', 'accepted')
-            ->select(
-                'users.id',
-                'users.name',
-                'users.email',
-                'friendships.sender_id as pivot_sender_id',
-                'friendships.receiver_id as pivot_receiver_id'
-            );
-
-        return $sent->union($received);
+    public function friendships()
+    {
+        return $this->hasMany(Friendship::class, 'sender_id')->orWhere('receiver_id', $this->id);
     }
 
     public function userGames()
@@ -124,4 +113,8 @@ class User extends Authenticatable
         return $this->hasMany(UserGame::class);
     }
 
+    public function receivedRecommendations()
+    {
+        return $this->hasMany(GameRecommendation::class, 'receiver_id');
+    }
 }

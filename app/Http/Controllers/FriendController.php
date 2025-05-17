@@ -115,4 +115,6 @@ class FriendController extends Controller
 
         return response()->json(['message' => 'Amic eliminat']);
     }
+
+    
 }

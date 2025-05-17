@@ -32,6 +32,10 @@
     <div id="notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-md">
         <p id="notification-message"></p>
     </div>
+
+    <div id="recommendations-container" class="mt-8">
+        <!-- Les recomanacions es carregaran aquí -->
+    </div>
 </div>
 
 <script src="{{ asset('js/llistes.js') }}"></script>

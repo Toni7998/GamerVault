@@ -1,9 +1,16 @@
 
 //  Hacemos que cuando arranca la web se haga lo que esta dentro del código
-document.addEventListener('DOMContentLoaded', function () {
-    fetchUserGameList();
-});
+document.addEventListener('DOMContentLoaded', async () => {
 
+    fetchUserGameList();
+
+    try {
+        const recommendations = await fetchReceivedRecommendations();
+        renderReceivedRecommendations(recommendations);
+    } catch (error) {
+        console.error("Error inicial:", error);
+    }
+});
 
 /**
  * Funció perquè l'usuari només tingui una llista que sigui la seva
@@ -107,6 +114,10 @@ function renderGameList(data) {
    class="text-blue-600 text-sm underline mt-2 hover:text-blue-800 text-center">
    🔗 Veure a RAWG
 </a>
+<br>
+<button data-game-id="${game.id}" class="recommend-game bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded mt-2 self-center">
+  📩 Recomanar a un amic
+</button>
 
     </div>
 
@@ -237,6 +248,107 @@ function renderGameList(data) {
             });
         }
 
+        gameCard.querySelector('.recommend-game').addEventListener('click', async (e) => {
+            const gameId = e.target.dataset.gameId;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            let friends = [];
+            try {
+                const friendsResponse = await fetch('/api/friends', {
+                    headers: { 'X-CSRF-TOKEN': csrfToken },
+                    credentials: 'include'  // <---- IMPORTANTE para mantener sesión
+                });
+                if (!friendsResponse.ok) throw new Error('No s\'han pogut carregar els amics');
+                friends = await friendsResponse.json();
+            } catch (err) {
+                return Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: err.message,
+                    background: '#1e1e1e',
+                    color: '#f0f0f0',
+                    customClass: { popup: 'swal2-dark' }
+                });
+            }
+
+            if (friends.length === 0) {
+                return Swal.fire({
+                    icon: 'info',
+                    title: 'Cap amic',
+                    text: 'No tens amics per recomanar aquest joc.',
+                    background: '#1e1e1e',
+                    color: '#f0f0f0',
+                    customClass: { popup: 'swal2-dark' }
+                });
+            }
+
+            const friendOptions = friends.reduce((obj, f) => {
+                obj[f.id] = f.name;
+                return obj;
+            }, {});
+
+            const { value: friendId } = await Swal.fire({
+                title: 'Recomanar joc a un amic',
+                input: 'select',
+                inputOptions: friendOptions,
+                inputPlaceholder: 'Selecciona un amic',
+                showCancelButton: true,
+                confirmButtonText: 'Enviar',
+                cancelButtonText: 'Cancel·la',
+                background: '#1e1e1e',
+                color: '#f0f0f0',
+                customClass: {
+                    popup: 'swal2-dark',
+                    input: 'swal2-select-dark'
+                },
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Si us plau, selecciona un amic!';
+                    }
+                }
+            });
+
+            if (friendId) {
+                try {
+                    const response = await fetch('/recommend-game', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        credentials: 'include', // <---- aquí también
+                        body: JSON.stringify({ game_id: gameId, friend_id: friendId })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Error enviant la recomanació');
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Recomanació enviada!',
+                        text: 'Has recomanat el joc al teu amic.',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        background: '#1e1e1e',
+                        color: '#f0f0f0',
+                        customClass: { popup: 'swal2-dark' }
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'No s\'ha pogut enviar la recomanació.',
+                        background: '#1e1e1e',
+                        color: '#f0f0f0',
+                        customClass: { popup: 'swal2-dark' }
+                    });
+                }
+            }
+        });
+
+
         gamesContainer.appendChild(gameCard);
     });
 
@@ -324,10 +436,11 @@ function renderSearchResults(games) {
 
 
 /**
- * Funció per afegir els jocs a la llista
+ * Funció per afegir els jocs a la llista i eliminar la recomanació
  * @param {*} game 
+ * @param {HTMLElement} [recommendationCard] - Elemento de la tarjeta de recomendación a eliminar
  */
-async function addGameToList(game) {
+async function addGameToList(game, recommendationCard) {
     const result = await Swal.fire({
         title: 'Afegir joc a la llista?',
         text: `Vols afegir "${game.name}" a la teva llista?`,
@@ -383,6 +496,27 @@ async function addGameToList(game) {
         }
 
         const data = await postResponse.json();
+
+        // Eliminar la recomendación si existe
+        if (recommendationCard) {
+            recommendationCard.remove();
+
+            // Actualizar contador de recomendaciones
+            const container = document.getElementById('recommendations-container');
+            const remainingCards = container.querySelectorAll('.list-card');
+            const title = container.querySelector('h3');
+
+            if (remainingCards.length === 0) {
+                container.innerHTML = `
+                    <div class="list-card" style="text-align: center; padding: 2rem;">
+                        <p style="font-size: 1.125rem; color: #fff; margin-bottom: 0.5rem;">🎉 Ja no tens recomanacions pendents</p>
+                        <p style="font-size: 0.875rem; color: #a0a0a0;">El joc s'ha afegit correctament a la teva llista</p>
+                    </div>
+                `;
+            } else if (title) {
+                title.innerHTML = `🎮 Jocs recomanats (${remainingCards.length})`;
+            }
+        }
 
         // Refrescar llista
         await fetchUserGameList();
@@ -538,5 +672,452 @@ function removeGameFromList(gameId) {
                     });
                 });
         }
+    });
+}
+
+// Función unificada para obtener recomendaciones
+async function fetchRecommendations() {
+    try {
+        const response = await fetch('/api/recommendations', {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Depuración: Ver los datos recibidos
+        console.log("Datos de recomendaciones recibidos:", data);
+
+        // Normalizar la estructura de datos
+        return data.map(item => ({
+            game: {
+                id: item.game?.id || item.game_id,
+                name: item.game?.name || item.game_name || "Joc desconegut",
+                background_image: item.game?.background_image || item.game_image || 'https://via.placeholder.com/150x200?text=No+Imatge'
+            },
+            sender: {
+                id: item.sender?.id || item.sender_id,
+                name: item.sender?.name || item.sender_name || "Amic desconegut"
+            },
+            message: item.message || item.note || "Sense missatge específic",
+            created_at: item.created_at || new Date().toISOString()
+        }));
+
+    } catch (error) {
+        console.error("Error al cargar recomendaciones:", error);
+        return [];
+    }
+}
+
+// Función mejorada para renderizar recomendaciones
+async function renderRecommendations(recommendations) {
+    const container = document.getElementById('recommendations-container');
+    if (!container) return;
+
+    // 1. Obtener la lista actual de juegos del usuario
+    let userGames = [];
+    try {
+        const response = await fetch('/game-list', {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            userGames = data.games || [];
+        }
+    } catch (error) {
+        console.error("Error al obtener la lista de juegos:", error);
+    }
+
+    // 2. Filtrar recomendaciones para excluir juegos ya en la lista
+    const filteredRecommendations = recommendations.filter(rec => {
+        return !userGames.some(game => game.id === rec.game.id);
+    });
+
+    // Limpiar el contenedor
+    container.innerHTML = '';
+
+    // Mostrar mensaje si no hay recomendaciones válidas
+    if (filteredRecommendations.length === 0) {
+        const message = recommendations.length === 0 ?
+            'Quan un amic et recomani un joc, apareixerà aquí.' :
+            'Tots els jocs recomanats ja estan a la teva llista.';
+
+        container.innerHTML = `
+            <div class="list-card" style="text-align: center; padding: 2rem;">
+                <p style="font-size: 1.125rem; color: #fff; margin-bottom: 0.5rem;">
+                    ${recommendations.length === 0 ? '📭 No tens recomanacions pendents' : '🎉 Tots els jocs afegits'}
+                </p>
+                <p style="font-size: 0.875rem; color: #a0a0a0;">${message}</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Título de sección
+    const title = document.createElement('h3');
+    title.style.fontSize = '1.5rem';
+    title.style.fontWeight = '600';
+    title.style.color = '#ffffff';
+    title.style.marginBottom = '1.5rem';
+    title.innerHTML = `🎮 Jocs recomanats (${filteredRecommendations.length})`;
+    container.appendChild(title);
+
+    // Agrupar recomendaciones por juego
+    const recommendationsByGame = filteredRecommendations.reduce((acc, rec) => {
+        const gameId = rec.game.id;
+        if (!acc[gameId]) {
+            acc[gameId] = {
+                game: rec.game,
+                recommendations: []
+            };
+        }
+        acc[gameId].recommendations.push({
+            sender: rec.sender,
+            message: rec.message,
+            date: rec.created_at
+        });
+        return acc;
+    }, {});
+
+    // Crear tarjeta para cada juego recomendado
+    const cardsContainer = document.createElement('div');
+    container.appendChild(cardsContainer);
+
+    Object.values(recommendationsByGame).forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'list-card';
+        card.style.marginBottom = '1.5rem';
+        card.style.padding = '1.5rem';
+        card.dataset.gameId = item.game.id; // Para referencia fácil
+
+        card.innerHTML = `
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div style="flex-shrink: 0;">
+                    <img src="${item.game.background_image || 'https://via.placeholder.com/150x200?text=No+Imatge'}" 
+                         alt="${item.game.name}"
+                         style="width: 96px; height: 96px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4); transition: transform 0.3s ease;">
+                </div>
+                
+                <div style="flex-grow: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h4 style="font-size: 1.125rem; font-weight: 600; color: #fff; margin-bottom: 0.25rem;">
+                                ${item.game.name}
+                            </h4>
+                            <p style="font-size: 0.875rem; color: #a0a0a0;">
+                                Recomanat per ${item.recommendations.length} amic${item.recommendations.length > 1 ? 's' : ''}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div style="max-height: 120px; overflow-y: auto; margin: 0.5rem 0;">
+                        ${item.recommendations.map(rec => `
+                            <div style="border-left: 2px solid #3b82f6; padding-left: 0.5rem; margin-bottom: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="font-weight: 500; color: #60a5fa;">${rec.sender.name}</span>
+                                    <span style="font-size: 0.75rem; color: #6b7280;">
+                                        ${new Date(rec.date).toLocaleDateString('ca-ES')}
+                                    </span>
+                                </div>
+                                ${rec.message ? `
+                                    <p style="font-size: 0.75rem; color: #d1d5db; font-style: italic; margin-top: 0.25rem;">
+                                        "${rec.message}"
+                                    </p>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                        <button data-game-id="${item.game.id}"
+                                style="padding: 0.5rem 1rem; background-color: #10b981; color: white; font-weight: 500; 
+                                       border-radius: 0.375rem; border: none; cursor: pointer; transition: background-color 0.3s;"
+                                onmouseover="this.style.backgroundColor='#059669'" 
+                                onmouseout="this.style.backgroundColor='#10b981'">
+                            Afegir a la meva llista
+                        </button>
+                        
+                        <a href="https://rawg.io/games/${item.game.id}" 
+                           target="_blank"
+                           style="padding: 0.5rem 1rem; background-color: #3b82f6; color: white; font-weight: 500; 
+                                  border-radius: 0.375rem; text-decoration: none; display: flex; align-items: center; 
+                                  transition: background-color 0.3s;"
+                           onmouseover="this.style.backgroundColor='#2563eb'" 
+                           onmouseout="this.style.backgroundColor='#3b82f6'">
+                            <span style="margin-right: 0.25rem;">🔗</span>
+                            Veure a RAWG
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Efecto hover para la imagen
+        const img = card.querySelector('img');
+        img.onmouseover = () => img.style.transform = 'scale(1.05)';
+        img.onmouseout = () => img.style.transform = 'scale(1)';
+
+        // Evento para añadir a la lista
+        card.querySelector('button').addEventListener('click', async () => {
+            try {
+                // Añadir el juego a la lista
+                await addGameToList({
+                    id: item.game.id,
+                    name: item.game.name,
+                    background_image: item.game.background_image
+                });
+
+                // Eliminar la tarjeta
+                card.remove();
+
+                // Actualizar el contador
+                const remainingCards = cardsContainer.querySelectorAll('.list-card');
+                if (remainingCards.length === 0) {
+                    container.innerHTML = `
+                        <div class="list-card" style="text-align: center; padding: 2rem;">
+                            <p style="font-size: 1.125rem; color: #fff; margin-bottom: 0.5rem;">🎉 Ja no tens recomanacions pendents</p>
+                            <p style="font-size: 0.875rem; color: #a0a0a0;">Tots els jocs s'han afegit a la teva llista</p>
+                        </div>
+                    `;
+                } else {
+                    title.innerHTML = `🎮 Jocs recomanats (${remainingCards.length})`;
+                }
+
+            } catch (error) {
+                console.error("Error al añadir el juego:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No s\'ha pogut afegir el joc a la llista',
+                    background: '#1e1e1e',
+                    color: '#f0f0f0',
+                    customClass: { popup: 'swal2-dark' }
+                });
+            }
+        });
+
+        cardsContainer.appendChild(card);
+    });
+}
+
+
+// Función para obtener recomendaciones recibidas
+async function fetchReceivedRecommendations() {
+    try {
+        const response = await fetch('/received-recommendations', {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Error al cargar recomendaciones');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error("Error:", error);
+
+        // Mostrar error al usuario
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'No s\'han pogut carregar les recomanacions',
+            background: '#1e1e1e',
+            color: '#f0f0f0',
+            customClass: { popup: 'swal2-dark' }
+        });
+
+        return [];
+    }
+}
+
+
+// Función para mostrar recomendaciones recibidas
+function renderReceivedRecommendations(recommendations) {
+    const container = document.getElementById('recommendations-container');
+    if (!container) return;
+
+    // Función para mostrar el mensaje cuando no hay recomendaciones
+    function showNoRecommendationsMessage() {
+        container.innerHTML = `
+            <div class="list-card" style="text-align: center; padding: 2rem;">
+                <p style="font-size: 1.125rem; color: #fff; margin-bottom: 0.5rem;">📭 No tens recomanacions pendents</p>
+                <p style="font-size: 0.875rem; color: #a0a0a0;">Quan un amic et recomani un joc, apareixerà aquí.</p>
+            </div>
+        `;
+    }
+
+    // Limpiar contenedor
+    container.innerHTML = '';
+    container.style.width = '100%';
+
+    // Si no hay recomendaciones
+    if (!recommendations || recommendations.length === 0) {
+        showNoRecommendationsMessage();
+        return;
+    }
+
+    // Título de sección
+    const title = document.createElement('h3');
+    title.style.fontSize = '1.5rem';
+    title.style.fontWeight = '600';
+    title.style.color = '#ffffff';
+    title.style.marginBottom = '1.5rem';
+    title.innerHTML = '🎮 Jocs recomanats pels teus amics';
+    container.appendChild(title);
+
+    // Contenedor para las tarjetas
+    const cardsContainer = document.createElement('div');
+    container.appendChild(cardsContainer);
+
+    // Crear tarjeta para cada recomendación
+    recommendations.forEach(rec => {
+        if (!rec.game || !rec.sender) return;
+
+        const card = document.createElement('div');
+        card.className = 'list-card';
+        card.style.marginBottom = '1.5rem';
+        card.style.padding = '1.5rem';
+
+        card.innerHTML = `
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <!-- Imagen del juego -->
+                <div style="flex-shrink: 0;">
+                    <img src="${rec.game.background_image || 'https://via.placeholder.com/150x200?text=No+Imatge'}" 
+                         alt="${rec.game.name}"
+                         style="width: 96px; height: 96px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);">
+                </div>
+                
+                <!-- Detalles -->
+                <div style="flex-grow: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h4 style="font-size: 1.125rem; font-weight: 600; color: #fff; margin-bottom: 0.25rem;">${rec.game.name}</h4>
+                            <p style="font-size: 0.875rem; color: #a0a0a0;">
+                                Recomanat per <span style="font-weight: 500; color: #60a5fa;">${rec.sender.name}</span>
+                            </p>
+                        </div>
+                        <span style="font-size: 0.75rem; color: #6b7280;">
+                            ${new Date(rec.created_at).toLocaleDateString('ca-ES')}
+                        </span>
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+                        <button data-game-id="${rec.game.id}"
+                                style="padding: 0.5rem 1rem; background-color: #10b981; color: white; font-weight: 500; border-radius: 0.375rem; border: none; cursor: pointer; transition: background-color 0.3s;"
+                                onmouseover="this.style.backgroundColor='#059669'" 
+                                onmouseout="this.style.backgroundColor='#10b981'">
+                            Afegir a la meva llista
+                        </button>
+                        
+                        <a href="https://rawg.io/games/${rec.game.id}" 
+                           target="_blank"
+                           style="padding: 0.5rem 1rem; background-color: #3b82f6; color: white; font-weight: 500; border-radius: 0.375rem; text-decoration: none; display: flex; align-items: center; transition: background-color 0.3s;"
+                           onmouseover="this.style.backgroundColor='#2563eb'" 
+                           onmouseout="this.style.backgroundColor='#3b82f6'">
+                            <span style="margin-right: 0.25rem;">🔗</span>
+                            Veure a RAWG
+                        </a>
+
+                        <button data-recommendation-id="${rec.id}" 
+                                style="padding: 0.5rem 1rem; background-color: #ef4444; color: white; font-weight: 500; border-radius: 0.375rem; border: none; cursor: pointer; transition: background-color 0.3s;"
+                                onmouseover="this.style.backgroundColor='#b91c1c'"
+                                onmouseout="this.style.backgroundColor='#ef4444'">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Añadir efecto hover a la imagen
+        const img = card.querySelector('img');
+        img.style.transition = 'transform 0.3s ease';
+        img.onmouseover = () => img.style.transform = 'scale(1.05)';
+        img.onmouseout = () => img.style.transform = 'scale(1)';
+
+        // Evento para añadir a la lista
+        card.querySelector('button[data-game-id]').addEventListener('click', () => {
+            addGameToList({
+                id: rec.game.id,
+                name: rec.game.name,
+                background_image: rec.game.background_image
+            });
+        });
+
+        // Evento para eliminar recomendación con confirmación SweetAlert dark
+        card.querySelector('button[data-recommendation-id]').addEventListener('click', async (e) => {
+            const recommendationId = e.target.dataset.recommendationId;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            const result = await Swal.fire({
+                title: 'Confirmar eliminació',
+                text: 'Segur que vols eliminar aquesta recomanació?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancel·lar',
+                customClass: { popup: 'swal2-dark' }
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/api/recommendations/${recommendationId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('No s\'ha pogut eliminar la recomanació.');
+                    }
+
+                    await Swal.fire({
+                        title: 'Eliminada!',
+                        text: 'La recomanació ha estat eliminada.',
+                        icon: 'success',
+                        customClass: { popup: 'swal2-dark' }
+                    });
+
+                    // Remover la tarjeta del DOM
+                    card.remove();
+
+                    // Si no quedan más tarjetas, mostrar mensaje de no recomendaciones
+                    if (cardsContainer.children.length === 0) {
+                        showNoRecommendationsMessage();
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: error.message || 'Error eliminant la recomanació.',
+                        icon: 'error',
+                        customClass: { popup: 'swal2-dark' }
+                    });
+                }
+            }
+        });
+
+        cardsContainer.appendChild(card);
     });
 }

@@ -662,3 +662,27 @@ footer {
     background-color: #b91c1c;
     /* rojo más oscuro */
 }
+
+/* Estilo general del modal oscuro */
+.swal2-dark {
+    background: #1e1e1e !important;
+    color: #f0f0f0 !important;
+    padding-top: 10px;
+}
+
+/* Estilo del modal para hacerlo más ancho */
+.swal2-popup {
+    width: 500px !important; /* Puedes ajustar este valor */
+}
+
+/* Estilo del select */
+.swal2-select-dark {
+    background: #333 !important;
+    color: #f0f0f0 !important;
+    border: 1px solid #555 !important;
+    width: 80%; /* Menor que el modal */
+    max-width: 80%;
+    margin: 0 auto; /* Centrar dentro del modal */
+    display: block;
+    box-sizing: border-box;
+}
