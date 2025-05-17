@@ -446,7 +446,7 @@ function renderSearchResults(games) {
 
 
 /**
- * Funció per afegir els jocs a la llista i eliminar la recomanació
+ * Función para agregar juegos a la lista y eliminar la recomendación
  * @param {*} game 
  * @param {HTMLElement} [recommendationCard] - Elemento de la tarjeta de recomendación a eliminar
  */
@@ -1054,7 +1054,7 @@ function renderReceivedRecommendations(recommendations) {
                 id: rec.game.id,
                 name: rec.game.name,
                 background_image: rec.game.background_image
-            });
+            }, card); // Pasamos la tarjeta como segundo parámetro
         });
 
         card.querySelector('button[data-recommendation-id]').addEventListener('click', async (e) => {
@@ -1111,4 +1111,3 @@ function renderReceivedRecommendations(recommendations) {
         cardsContainer.appendChild(card);
     });
 }
-
