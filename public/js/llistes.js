@@ -256,10 +256,20 @@ function renderGameList(data) {
             try {
                 const friendsResponse = await fetch('/api/friends', {
                     headers: { 'X-CSRF-TOKEN': csrfToken },
-                    credentials: 'include'  // <---- IMPORTANTE para mantener sesión
+                    credentials: 'include'
                 });
                 if (!friendsResponse.ok) throw new Error('No s\'han pogut carregar els amics');
                 friends = await friendsResponse.json();
+
+                // Ensure friends array contains both types of relationships
+                friends = friends.map(friend => {
+                    // Normalize friend data structure
+                    return {
+                        id: friend.id || friend.user_id,
+                        name: friend.name || friend.username || friend.email,
+                        // Add any other necessary fields
+                    };
+                });
             } catch (err) {
                 return Swal.fire({
                     icon: 'error',
@@ -316,7 +326,7 @@ function renderGameList(data) {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrfToken
                         },
-                        credentials: 'include', // <---- aquí también
+                        credentials: 'include',
                         body: JSON.stringify({ game_id: gameId, friend_id: friendId })
                     });
 
@@ -954,7 +964,6 @@ function renderReceivedRecommendations(recommendations) {
     const container = document.getElementById('recommendations-container');
     if (!container) return;
 
-    // Función para mostrar el mensaje cuando no hay recomendaciones
     function showNoRecommendationsMessage() {
         container.innerHTML = `
             <div class="list-card" style="text-align: center; padding: 2rem;">
@@ -964,17 +973,14 @@ function renderReceivedRecommendations(recommendations) {
         `;
     }
 
-    // Limpiar contenedor
     container.innerHTML = '';
     container.style.width = '100%';
 
-    // Si no hay recomendaciones
     if (!recommendations || recommendations.length === 0) {
         showNoRecommendationsMessage();
         return;
     }
 
-    // Título de sección
     const title = document.createElement('h3');
     title.style.fontSize = '1.5rem';
     title.style.fontWeight = '600';
@@ -983,11 +989,9 @@ function renderReceivedRecommendations(recommendations) {
     title.innerHTML = '🎮 Jocs recomanats pels teus amics';
     container.appendChild(title);
 
-    // Contenedor para las tarjetas
     const cardsContainer = document.createElement('div');
     container.appendChild(cardsContainer);
 
-    // Crear tarjeta para cada recomendación
     recommendations.forEach(rec => {
         if (!rec.game || !rec.sender) return;
 
@@ -998,18 +1002,22 @@ function renderReceivedRecommendations(recommendations) {
 
         card.innerHTML = `
             <div style="display: flex; gap: 1rem; align-items: flex-start;">
-                <!-- Imagen del juego -->
                 <div style="flex-shrink: 0;">
                     <img src="${rec.game.background_image || 'https://via.placeholder.com/150x200?text=No+Imatge'}" 
                          alt="${rec.game.name}"
                          style="width: 96px; height: 96px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);">
                 </div>
-                
-                <!-- Detalles -->
                 <div style="flex-grow: 1;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <h4 style="font-size: 1.125rem; font-weight: 600; color: #fff; margin-bottom: 0.25rem;">${rec.game.name}</h4>
+                            <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem;">
+                                <a href="https://rawg.io/games/${rec.game.id}" target="_blank"
+                                   style="color: #ffffff; text-decoration: none; transition: 0.3s;"
+                                   onmouseover="this.style.color='#60a5fa'"
+                                   onmouseout="this.style.color='#ffffff'">
+                                    ${rec.game.name}
+                                </a>
+                            </h4>
                             <p style="font-size: 0.875rem; color: #a0a0a0;">
                                 Recomanat per <span style="font-weight: 500; color: #60a5fa;">${rec.sender.name}</span>
                             </p>
@@ -1018,43 +1026,29 @@ function renderReceivedRecommendations(recommendations) {
                             ${new Date(rec.created_at).toLocaleDateString('ca-ES')}
                         </span>
                     </div>
-                    
-                    <!-- Botones -->
                     <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
                         <button data-game-id="${rec.game.id}"
-                                style="padding: 0.5rem 1rem; background-color: #10b981; color: white; font-weight: 500; border-radius: 0.375rem; border: none; cursor: pointer; transition: background-color 0.3s;"
+                                style="padding: 0.6rem 1.2rem; background-color: #10b981; color: white; font-weight: 600; border-radius: 0.5rem; border: none; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 0.5rem;"
                                 onmouseover="this.style.backgroundColor='#059669'" 
                                 onmouseout="this.style.backgroundColor='#10b981'">
-                            Afegir a la meva llista
+                            ✅ Afegir a la meva llista
                         </button>
-                        
-                        <a href="https://rawg.io/games/${rec.game.id}" 
-                           target="_blank"
-                           style="padding: 0.5rem 1rem; background-color: #3b82f6; color: white; font-weight: 500; border-radius: 0.375rem; text-decoration: none; display: flex; align-items: center; transition: background-color 0.3s;"
-                           onmouseover="this.style.backgroundColor='#2563eb'" 
-                           onmouseout="this.style.backgroundColor='#3b82f6'">
-                            <span style="margin-right: 0.25rem;">🔗</span>
-                            Veure a RAWG
-                        </a>
-
                         <button data-recommendation-id="${rec.id}" 
-                                style="padding: 0.5rem 1rem; background-color: #ef4444; color: white; font-weight: 500; border-radius: 0.375rem; border: none; cursor: pointer; transition: background-color 0.3s;"
+                                style="padding: 0.6rem 1.2rem; background-color: #ef4444; color: white; font-weight: 600; border-radius: 0.5rem; border: none; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 0.5rem;"
                                 onmouseover="this.style.backgroundColor='#b91c1c'"
                                 onmouseout="this.style.backgroundColor='#ef4444'">
-                            Eliminar
+                            🗑️ Eliminar
                         </button>
                     </div>
                 </div>
             </div>
         `;
 
-        // Añadir efecto hover a la imagen
         const img = card.querySelector('img');
         img.style.transition = 'transform 0.3s ease';
         img.onmouseover = () => img.style.transform = 'scale(1.05)';
         img.onmouseout = () => img.style.transform = 'scale(1)';
 
-        // Evento para añadir a la lista
         card.querySelector('button[data-game-id]').addEventListener('click', () => {
             addGameToList({
                 id: rec.game.id,
@@ -1063,7 +1057,6 @@ function renderReceivedRecommendations(recommendations) {
             });
         });
 
-        // Evento para eliminar recomendación con confirmación SweetAlert dark
         card.querySelector('button[data-recommendation-id]').addEventListener('click', async (e) => {
             const recommendationId = e.target.dataset.recommendationId;
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -1100,10 +1093,7 @@ function renderReceivedRecommendations(recommendations) {
                         customClass: { popup: 'swal2-dark' }
                     });
 
-                    // Remover la tarjeta del DOM
                     card.remove();
-
-                    // Si no quedan más tarjetas, mostrar mensaje de no recomendaciones
                     if (cardsContainer.children.length === 0) {
                         showNoRecommendationsMessage();
                     }
@@ -1121,3 +1111,4 @@ function renderReceivedRecommendations(recommendations) {
         cardsContainer.appendChild(card);
     });
 }
+

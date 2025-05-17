@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\GameRecommendation;
 use App\Models\User;
 use App\Models\Game;
+use App\Models\Friendship;
 
 class RecommendationController extends Controller
 {
@@ -19,9 +20,16 @@ class RecommendationController extends Controller
 
         $user = Auth::user();
 
-        // Verifica si son amigos
-        $areFriends = $user->friends()
-            ->where('users.id', $request->friend_id)
+        // Verificar si existe una amistad aceptada en cualquier dirección
+        $areFriends = Friendship::where(function ($query) use ($user, $request) {
+            $query->where('sender_id', $user->id)
+                ->where('receiver_id', $request->friend_id);
+        })
+            ->orWhere(function ($query) use ($user, $request) {
+                $query->where('sender_id', $request->friend_id)
+                    ->where('receiver_id', $user->id);
+            })
+            ->where('status', 'accepted')
             ->exists();
 
         if (!$areFriends) {
@@ -36,6 +44,7 @@ class RecommendationController extends Controller
 
         return response()->json(['message' => 'Recomanació enviada correctament.']);
     }
+
 
     public function getReceivedRecommendations(Request $request)
     {
@@ -87,5 +96,4 @@ class RecommendationController extends Controller
 
         return response()->json(['message' => 'Recomendación eliminada correctamente']);
     }
-
 }
