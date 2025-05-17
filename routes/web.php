@@ -14,8 +14,9 @@ use App\Http\Controllers\FriendController;
 use App\Http\Controllers\Api\PersonalRankingController;
 use App\Http\Controllers\ForumController;
 use App\Models\ForumThread;
-use App\Http\Controllers\UserGameController;
 use Illuminate\Http\Request;
+use App\Models\Game;
+use App\Models\GameRating;
 
 /*
 |----------------------------------------------------------------------
@@ -112,50 +113,113 @@ Route::get('/api/ranking', function () {
 });
 
 
-// 🎲 Ruta API que genera recomendaciones dinámicas según el día de la semana
+//  Nuevas recomendaciones
 Route::get('/api/recommendations', function () {
-    $day = now()->dayOfWeek;
+    $user = Auth::user();
+    if (!$user) return response()->json([], 401);
 
-    // Criterios de ordenación según el día
-    $orderingOptions = [
-        '-rating',      // Domingo
-        '-added',       // Lunes
-        '-released',    // Martes
-        '-updated',     // Miércoles
-        'name',         // Jueves
-        '-metacritic',  // Viernes
-        'released'      // Sábado
-    ];
+    $RAWG_API_KEY = 'a6932e9255e64cf98bfa75abde510c5d';
 
-    // Nombres bonitos en catalán según el día
-    $dayNames = [
-        '✨ Diumenges de clàssics',
-        '🚀 Dilluns futuristes',
-        '🔫 Dimarts d\'acció',
-        '🧠 Dimecres estratègics',
-        '🎨 Dijous creatius',
-        '🏆 Divendres top',
-        '🎮 Dissabtes d\'aventures'
-    ];
+    // 1. Obtener los juegos valorados >= 4 en game_ratings
+    $likedGameRatings = GameRating::where('user_id', $user->id)
+        ->where('rating', '>=', 4)
+        ->get();
 
-    $ordering = $orderingOptions[$day];
-    $sender = $dayNames[$day];
+    // Traemos los juegos completos para acceder al id, nombre, etc
+    $likedGames = Game::whereIn('id', $likedGameRatings->pluck('game_id'))->get();
 
-    $response = Http::get('https://api.rawg.io/api/games', [
-        'key' => 'a6932e9255e64cf98bfa75abde510c5d',
-        'ordering' => $ordering,
-        'page_size' => 5,
-    ]);
+    // Juegos que ya tiene el usuario para excluirlos de las recomendaciones
+    $excludedIds = GameRating::where('user_id', $user->id)->pluck('game_id')->toArray();
 
-    $games = $response->json()['results'] ?? [];
-
-    // Construir las recomendaciones basadas en los juegos obtenidos
     $recommendations = [];
-    foreach ($games as $game) {
-        $recommendations[] = [
-            'sender' => $sender,
-            'game' => $game['name'],
-        ];
+    $addedIds = [];
+
+    // 2. Recomendaciones similares a juegos favoritos (máx 3 juegos base)
+    foreach ($likedGames->shuffle()->take(3) as $liked) {
+        $res = Http::get("https://api.rawg.io/api/games/{$liked->id}/suggested", [
+            'key' => $RAWG_API_KEY,
+            'page_size' => 5,
+        ]);
+
+        $suggested = $res->json()['results'] ?? [];
+
+        foreach ($suggested as $game) {
+            if (in_array($game['id'], $excludedIds) || in_array($game['id'], $addedIds)) continue;
+
+            $recommendations[] = [
+                'sender' => "🧠 Perquè t'agrada *{$liked->name}*",
+                'game' => $game['name'],
+            ];
+            $addedIds[] = $game['id'];
+
+            if (count($recommendations) >= 10) break 2;
+        }
+    }
+
+    // 3. Relleno: géneros favoritos + top
+    if (count($recommendations) < 10) {
+        $genreCounts = [];
+
+        foreach ($likedGames as $game) {
+            $res = Http::get("https://api.rawg.io/api/games/{$game->id}", [
+                'key' => $RAWG_API_KEY,
+            ]);
+
+            $genres = $res->json()['genres'] ?? [];
+            foreach ($genres as $g) {
+                $slug = $g['slug'];
+                $genreCounts[$slug] = ($genreCounts[$slug] ?? 0) + 1;
+            }
+        }
+
+        arsort($genreCounts);
+        $topGenres = array_keys(array_slice($genreCounts, 0, 2));
+
+        foreach ($topGenres as $genre) {
+            $res = Http::get('https://api.rawg.io/api/games', [
+                'key' => $RAWG_API_KEY,
+                'genres' => $genre,
+                'ordering' => '-rating',
+                'page_size' => 10,
+            ]);
+
+            $games = $res->json()['results'] ?? [];
+
+            foreach ($games as $game) {
+                if (in_array($game['id'], $excludedIds) || in_array($game['id'], $addedIds)) continue;
+
+                $recommendations[] = [
+                    'sender' => "🔥 Top del gènere *$genre*",
+                    'game' => $game['name'],
+                ];
+                $addedIds[] = $game['id'];
+
+                if (count($recommendations) >= 10) break 2;
+            }
+        }
+    }
+
+    // 4. Último recurso: tendencias
+    if (count($recommendations) < 10) {
+        $res = Http::get('https://api.rawg.io/api/games', [
+            'key' => $RAWG_API_KEY,
+            'ordering' => '-added',
+            'page_size' => 10,
+        ]);
+
+        $games = $res->json()['results'] ?? [];
+
+        foreach ($games as $game) {
+            if (in_array($game['id'], $excludedIds) || in_array($game['id'], $addedIds)) continue;
+
+            $recommendations[] = [
+                'sender' => '📈 Tendència actual',
+                'game' => $game['name'],
+            ];
+            $addedIds[] = $game['id'];
+
+            if (count($recommendations) >= 10) break;
+        }
     }
 
     return response()->json($recommendations);
