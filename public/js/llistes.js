@@ -2,14 +2,37 @@
 //  Hacemos que cuando arranca la web se haga lo que esta dentro del código
 document.addEventListener('DOMContentLoaded', async () => {
 
+    // Primero cargar la lista de juegos del usuario
     fetchUserGameList();
 
+    // Luego cargar las recomendaciones, filtrando las que ya están en la lista
     try {
         const recommendations = await fetchReceivedRecommendations();
-        renderReceivedRecommendations(recommendations);
+
+        // Obtener la lista actual de juegos del usuario para filtrar
+        const userGamesResponse = await fetch('/game-list', {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        let userGames = [];
+        if (userGamesResponse.ok) {
+            const userData = await userGamesResponse.json();
+            userGames = userData.games || [];
+        }
+
+        // Filtrar recomendaciones que ya están en la lista
+        const filteredRecommendations = recommendations.filter(rec => {
+            return !userGames.some(game => game.id === rec.game.id);
+        });
+
+        renderReceivedRecommendations(filteredRecommendations);
     } catch (error) {
         console.error("Error inicial:", error);
     }
+
 });
 
 /**
@@ -509,6 +532,21 @@ async function addGameToList(game, recommendationCard) {
 
         // Eliminar la recomendación si existe
         if (recommendationCard) {
+            // Obtener el ID de la recomendación del botón de eliminar
+            const deleteButton = recommendationCard.querySelector('button[data-recommendation-id]');
+            const recommendationId = deleteButton ? deleteButton.dataset.recommendationId : null;
+
+            if (recommendationId) {
+                // Eliminar la recomendación del servidor
+                await fetch(`/api/recommendations/${recommendationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+            }
+
+            // Eliminar visualmente la tarjeta
             recommendationCard.remove();
 
             // Actualizar contador de recomendaciones
@@ -530,6 +568,10 @@ async function addGameToList(game, recommendationCard) {
 
         // Refrescar llista
         await fetchUserGameList();
+
+        // Refrescar las recomendaciones
+        const updatedRecommendations = await fetchReceivedRecommendations();
+        renderReceivedRecommendations(updatedRecommendations);
 
         Swal.fire({
             icon: 'success',
