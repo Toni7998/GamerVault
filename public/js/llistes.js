@@ -517,7 +517,11 @@ async function addGameToList(game, recommendationCard) {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                 'Accept': 'application/json',
             },
-            body: JSON.stringify(detailedGame)
+            body: JSON.stringify({
+                id: detailedGame.id,
+                title: detailedGame.name,
+                image_url: detailedGame.background_image || 'https://placehold.co/150x150?text=Sense+imatge'
+            })
         });
 
         if (!postResponse.ok) {
@@ -585,7 +589,7 @@ async function addGameToList(game, recommendationCard) {
 
         // Guarda info bàsica localment
         localStorage.setItem(`game-name-${game.id}`, game.name);
-        localStorage.setItem(`game-image-${game.id}`, game.background_image || '');
+        localStorage.setItem(`game-image-${game.id}`, game.background_image || 'https://placehold.co/150x150?text=Sense+imatge');
         localStorage.setItem(`game-platforms-${game.id}`, game.platforms?.map(p => p.platform.name).join(', ') || '');
         localStorage.setItem(`game-released-${game.id}`, game.released || '');
 

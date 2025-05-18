@@ -19,9 +19,6 @@ return new class extends Migration
             $table->string('slug')->nullable();
             $table->string('website_url')->nullable(); 
 
-            // Relación con la lista
-            $table->foreignId('game_list_id')->constrained()->onDelete('cascade');
-
             // Opcionales per la app
             $table->string('platform')->nullable();
             $table->boolean('completed')->default(false);

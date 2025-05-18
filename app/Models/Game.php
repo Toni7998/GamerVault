@@ -15,14 +15,8 @@ class Game extends Model
         'background_image',
         'platform',  // Mantener el campo platform
         'completed',
-        'game_list_id'
     ];
 
-    // Relación con la lista de juegos
-    public function list()
-    {
-        return $this->belongsTo(GameList::class, 'game_list_id');
-    }
 
     // Relación con las valoraciones de los juegos
     public function ratings()
@@ -35,4 +29,8 @@ class Game extends Model
         return $this->hasMany(UserGame::class);
     }
 
+    public function gameLists()
+    {
+        return $this->belongsToMany(GameList::class);
+    }
 }

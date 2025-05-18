@@ -35,47 +35,33 @@ class GameListController extends Controller
 
     public function addGame(Request $request)
     {
-        // Validar que se envíe el ID
-        $request->validate(['id' => 'required|integer']);
+        $request->validate([
+            'id' => 'required|integer',
+            'title' => 'required|string',
+            'image_url' => 'nullable|string'
+        ]);
 
         $user = Auth::user();
-        $gameId = $request->input('id');
-
-        // Buscar la lista del usuario
         $gameList = GameList::where('user_id', $user->id)->first();
 
         if (!$gameList) {
             return response()->json(['error' => 'No tens cap llista'], 404);
         }
 
-        $gameListId = $gameList->id;
-
-        // Verificar si el juego ya existe en la DB
-        $game = Game::find($gameId);
-
-        // Si no existe, obtenerlo de la API y guardarlo
-        if (!$game) {
-            $gameData = $this->getGameFromRawg($gameId);
-
-            if (!$gameData) {
-                return response()->json(['error' => 'No s\'ha pogut trobar el joc a RAWG'], 404);
-            }
-
-            $game = Game::create([
-                'id' => $gameData['id'],
-                'name' => $gameData['name'],
-                'released' => $gameData['released'] ?? null,
-                'background_image' => $gameData['background_image'] ?? null,
-                'platform' => $gameData['platforms'][0]['platform']['name'] ?? null,
+        // Buscar o crear el juego en la base de datos local
+        $game = Game::firstOrCreate(
+            ['id' => $request->input('id')],
+            [
+                'name' => $request->input('title'),
+                'image_url' => $request->input('image_url'),
                 'completed' => false,
-                'game_list_id' => $gameListId,
-            ]);
-        } else {
-            // Si el juego ya existe pero no está asociado, actualizarlo
-            if ($game->game_list_id !== $gameListId) {
-                $game->game_list_id = $gameListId;
-                $game->save();
-            }
+            ]
+        );
+
+
+        // Agregar el juego a la lista si no está ya
+        if (!$gameList->games->contains($game->id)) {
+            $gameList->games()->attach($game->id);
         }
 
         return response()->json([
@@ -83,6 +69,7 @@ class GameListController extends Controller
             'game' => $game
         ]);
     }
+
 
     // Eliminar un juego de la lista del usuario
     public function removeGame(Request $request)
