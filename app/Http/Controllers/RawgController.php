@@ -9,7 +9,7 @@ class RawgController extends Controller
     public function getGameDetails($id)
     {
         try {
-            $apiKey = env('RAWG_API_KEY');
+            $apiKey = 'a6932e9255e64cf98bfa75abde510c5d';
             $response = Http::get("https://api.rawg.io/api/games/{$id}?key={$apiKey}");
 
             if ($response->failed()) {

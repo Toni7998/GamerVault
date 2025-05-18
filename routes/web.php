@@ -382,7 +382,7 @@ Route::get('/forum/{thread}/posts', [ForumController::class, 'getPosts']);
 Route::post('/forum/{thread}/posts', [ForumController::class, 'storePost'])->middleware('auth');
 
 //  Conseguir ruta de la api de RAWG
-Route::get('/api/rawg/details/{id}', [\App\Http\Controllers\RawgController::class, 'getGameDetails']);
+Route::get('/rawg/details/{id}', [\App\Http\Controllers\RawgController::class, 'getGameDetails']);
 
 //  Ruta para los comentarios
 Route::post('/test-update', function (Request $request) {

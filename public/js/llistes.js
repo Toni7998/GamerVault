@@ -520,7 +520,9 @@ async function addGameToList(game, recommendationCard) {
             body: JSON.stringify({
                 id: detailedGame.id,
                 title: detailedGame.name,
-                image_url: detailedGame.background_image || 'https://placehold.co/150x150?text=Sense+imatge'
+                background_image: detailedGame.background_image || 'https://placehold.co/150x150?text=Sense+imatge',
+                released: detailedGame.released,
+                platform: detailedGame.platforms?.[0]?.platform?.name || null
             })
         });
 

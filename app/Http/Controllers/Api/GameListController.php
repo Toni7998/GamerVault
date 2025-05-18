@@ -36,9 +36,9 @@ class GameListController extends Controller
     public function addGame(Request $request)
     {
         $request->validate([
-            'id' => 'required|integer',
+            'id' => 'required|integer|min:1',
             'title' => 'required|string',
-            'image_url' => 'nullable|string'
+            'background_image' => 'nullable|string'
         ]);
 
         $user = Auth::user();
@@ -53,10 +53,13 @@ class GameListController extends Controller
             ['id' => $request->input('id')],
             [
                 'name' => $request->input('title'),
-                'image_url' => $request->input('image_url'),
+                'background_image' => $request->input('background_image'),
+                'released' => $request->input('released'),
+                'platform' => $request->input('platform'),
                 'completed' => false,
             ]
         );
+
 
 
         // Agregar el juego a la lista si no está ya

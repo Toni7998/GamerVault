@@ -7,6 +7,9 @@ use App\Models\UserGame;
 
 class Game extends Model
 {
+    public $incrementing = false;
+    protected $keyType = 'int';
+
     protected $fillable = [
         'id',
         'name',
@@ -31,6 +34,6 @@ class Game extends Model
 
     public function gameLists()
     {
-        return $this->belongsToMany(GameList::class);
+        return $this->belongsToMany(GameList::class, 'game_game_list');
     }
 }
