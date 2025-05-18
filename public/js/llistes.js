@@ -379,6 +379,7 @@ function renderGameList(data) {
                     });
                 }
             }
+
         });
 
 

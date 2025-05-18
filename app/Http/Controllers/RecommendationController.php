@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\GameRecommendation;
 use App\Models\User;
 use App\Models\Game;
@@ -36,6 +37,15 @@ class RecommendationController extends Controller
             return response()->json(['message' => 'No pots recomanar a algú que no és amic teu.'], 403);
         }
 
+        $friendHasGame = DB::table('user_games')
+            ->where('user_id', $request->friend_id)
+            ->where('game_id', $request->game_id)
+            ->exists();
+
+        if ($friendHasGame) {
+            return response()->json(['message' => 'Aquest amic ja té aquest joc a la seva llista.'], 400);
+        }
+
         GameRecommendation::create([
             'sender_id' => $user->id,
             'receiver_id' => $request->friend_id,
@@ -44,6 +54,7 @@ class RecommendationController extends Controller
 
         return response()->json(['message' => 'Recomanació enviada correctament.']);
     }
+
 
 
     public function getReceivedRecommendations(Request $request)
