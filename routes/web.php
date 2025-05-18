@@ -310,7 +310,8 @@ Route::post('/contacte', [ContactController::class, 'store']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/game-list', [GameListController::class, 'index']);
     Route::post('/game-list', [GameListController::class, 'addGame']);
-    Route::delete('/game-list/{id}', [GameListController::class, 'removeGame']);
+    Route::delete('/game-list/remove', [GameListController::class, 'removeGame']);
+    Route::delete('/game-list/game/{id}', [GameListController::class, 'destroy']);
 });
 
 

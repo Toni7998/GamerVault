@@ -689,8 +689,8 @@ function removeGameFromList(gameId) {
         if (result.isConfirmed) {
             fetch(`/game-list/${gameId}`, {
                 method: 'DELETE',
+                credentials: 'same-origin',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     'Accept': 'application/json',
                 }
@@ -708,7 +708,7 @@ function removeGameFromList(gameId) {
                 })
                 .then(data => {
                     console.log("Eliminat:", data);
-                    fetchUserGameList();
+                    fetchUserGameList();  // refresca lista o lo que tengas para actualizar UI
                     Swal.fire({
                         icon: 'success',
                         title: 'Eliminat!',
@@ -732,6 +732,7 @@ function removeGameFromList(gameId) {
         }
     });
 }
+
 
 // Función unificada para obtener recomendaciones
 async function fetchRecommendations() {

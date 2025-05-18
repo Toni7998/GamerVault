@@ -84,40 +84,40 @@ class GameListController extends Controller
         $user = Auth::user();
         $gameId = $request->input('game_id');
 
-        // Buscar la lista del usuario
         $gameList = GameList::where('user_id', $user->id)->first();
 
         if (!$gameList) {
             return response()->json(['error' => 'No tens cap llista'], 404);
         }
 
-        // Buscar el juego que pertenezca a la lista del usuario
-        $game = Game::where('id', $gameId)
-            ->where('game_list_id', $gameList->id)
-            ->first();
-
-        if (!$game) {
+        if (!$gameList->games->contains($gameId)) {
             return response()->json(['error' => 'Aquest joc no és a la teva llista'], 400);
         }
 
-        // Eliminar el juego de la base de datos
-        $game->delete();
+        $gameList->games()->detach($gameId);
 
-        return response()->json(['message' => 'Joc eliminat correctament']);
+        return response()->json(['message' => 'Joc eliminat correctament de la teva llista']);
     }
+
 
     public function destroy($id)
     {
-        $game = Game::find($id);
+        $user = Auth::user();
+        $gameList = GameList::where('user_id', $user->id)->first();
 
-        if (!$game) {
-            return response()->json(['message' => 'Juego no encontrado'], 404);
+        if (!$gameList) {
+            return response()->json(['error' => 'No tens cap llista'], 404);
         }
 
-        $game->delete();
+        if (!$gameList->games()->where('games.id', $id)->exists()) {
+            return response()->json(['error' => 'Aquest joc no és a la teva llista'], 400);
+        }
 
-        return response()->json(['message' => 'Juego eliminado correctamente']);
+        $gameList->games()->detach($id);
+
+        return response()->json(['message' => 'Joc eliminat correctament de la teva llista']);
     }
+
 
     public function updateStatus($gameId, Request $request)
     {
