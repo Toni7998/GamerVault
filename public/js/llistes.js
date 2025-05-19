@@ -609,7 +609,6 @@ async function addGameToList(game, recommendationCard) {
 }
 
 
-
 /**
  * Funció per actualitzar l'estat del joc
  * @param {*} gameId 
@@ -618,26 +617,15 @@ async function addGameToList(game, recommendationCard) {
 function updateGameStatus(gameId, status) {
     localStorage.setItem(`game-status-${gameId}`, status);
 
-    fetch(`/game-list/${gameId}/status`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({ status })
-    })
-        .then(res => res.json())
-        .then(data => {
-            console.log("Estat actualitzat", data);
-            Swal.fire({
-                icon: 'success',
-                title: 'Estat actualitzat ✅',
-                timer: 1500,
-                showConfirmButton: false,
-                background: '#1e1e1e',
-                color: '#f0f0f0'
-            });
-        });
+    console.log("Estat actual del joc guardat correctament:", status);
+    Swal.fire({
+        icon: 'success',
+        title: 'Estat guardat localment ✅',
+        timer: 1500,
+        showConfirmButton: false,
+        background: '#1e1e1e',
+        color: '#f0f0f0'
+    });
 }
 
 
@@ -647,27 +635,19 @@ function updateGameStatus(gameId, status) {
  * @param {*} comment 
  */
 function updateGameComment(gameId, comment) {
-    fetch('/test-update', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({ test: true })
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Error al guardar el comentari");
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Comentari actualitzat:", data);
-        })
-        .catch(error => {
-            console.error("Error al guardar el comentari", error);
-        });
+    localStorage.setItem(`game-comment-${gameId}`, comment);
+
+    console.log("Comentari guardat localment:", comment);
+    Swal.fire({
+        icon: 'success',
+        title: 'Comentari guardat localment ✅',
+        timer: 1500,
+        showConfirmButton: false,
+        background: '#1e1e1e',
+        color: '#f0f0f0'
+    });
 }
+
 
 
 /**
