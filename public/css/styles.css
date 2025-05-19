@@ -672,7 +672,8 @@ footer {
 
 /* Estilo del modal para hacerlo más ancho */
 .swal2-popup {
-    width: 500px !important; /* Puedes ajustar este valor */
+    width: 500px !important;
+    /* Puedes ajustar este valor */
 }
 
 /* Estilo del select */
@@ -680,9 +681,94 @@ footer {
     background: #333 !important;
     color: #f0f0f0 !important;
     border: 1px solid #555 !important;
-    width: 80%; /* Menor que el modal */
+    width: 80%;
+    /* Menor que el modal */
     max-width: 80%;
-    margin: 0 auto; /* Centrar dentro del modal */
+    margin: 0 auto;
+    /* Centrar dentro del modal */
     display: block;
     box-sizing: border-box;
+}
+
+#friends-list li {
+    margin-bottom: 0.75rem;
+    /* 12px aprox */
+}
+
+/* Para evitar margen extra en el último li */
+#friends-list li:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+
+    .navbar-links {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .navbar-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .list-card {
+        margin-right: 0;
+        /* elimina margen horizontal extra */
+    }
+
+    .lists-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .star-rating {
+        font-size: 1.5rem;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    .navbar-title {
+        font-size: 1.5rem;
+        text-align: left;
+    }
+}
+
+@media (max-width: 900px) {
+    .lists-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .navbar {
+        padding: 1rem;
+    }
+
+    .list-card {
+        padding: 1rem;
+    }
+
+    .star-rating {
+        font-size: 1.4rem;
+    }
+
+    .game-ranking-list li,
+    #recommendations-list li {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .game-ranking-list img,
+    #recommendations-list img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+    }
 }

@@ -576,3 +576,100 @@ textarea:focus {
     color: #c084fc;
     text-decoration: underline;
 }
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+
+    /* Grid de características pasa a una columna */
+    .features-grid {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+    }
+
+    /* Menú navbar con menos espacio entre links */
+    .navbar ul {
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    /* Menor padding en contenedor general */
+    .container {
+        padding: 1rem;
+    }
+}
+
+/* Para que los enlaces no se encojan y mantengan tamaño legible en navbar */
+.navbar-links>li>a,
+.navbar-links>li>form>button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Navbar flex-wrap para que se adapte en móviles */
+.navbar {
+    flex-wrap: wrap;
+}
+
+/* Navbar-inner con scroll horizontal para móviles */
+.navbar-inner {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Scrollbar personalizada para navbar-inner */
+.navbar-inner::-webkit-scrollbar {
+    height: 6px;
+}
+
+.navbar-inner::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+/* Carousel track permite scroll horizontal en dispositivos móviles */
+.carousel-track {
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+}
+
+/* Ocultar scrollbar en carousel para limpiar móvil */
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+/* Enlaces y botones dentro navbar con flex-shrink 0 para no encoger */
+.navbar-links>li>a,
+.navbar-links>li>form>button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Por defecto: logo y nav en fila */
+.navbar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Responsive: a partir de 768px y abajo */
+@media (max-width: 768px) {
+  .navbar-inner {
+    flex-direction: column;
+    align-items: flex-start; /* Logo y nav alineados a la izquierda */
+    gap: 0.75rem; /* Separación vertical entre logo y nav */
+  }
+
+  /* Para que la lista de links ocupe todo el ancho disponible */
+  .navbar-links {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap; /* Para que los links puedan ir a más líneas si no caben */
+    gap: 1rem;
+  }
+
+  /* Opcional: que el logo no sea tan grande y se ajuste bien */
+  .navbar-inner a img {
+    height: 8rem; /* O cualquier tamaño que quieras para móvil */
+  }
+}
