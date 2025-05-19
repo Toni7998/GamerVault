@@ -79,7 +79,7 @@
                 @guest
                 <li>
                     <a href="{{ route('login') }}" class="nav-link text-lg hover:text-green-400">
-                        🔑 Iniciar sessió
+                        🔑 Inicia Sessió
                     </a>
                 </li>
                 @endguest

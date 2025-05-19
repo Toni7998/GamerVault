@@ -27,12 +27,12 @@
                     <form method="POST" action="{{ route('logout') }}" class="inline-form">
                         @csrf
                         <button type="submit" class="link-button text-lg hover:text-red-400">
-                            🚪 Tancar sessió
+                            🚪 Tancar Sessió
                         </button>
                     </form>
                     @else
                     <a href="{{ route('login') }}" class="link-button text-lg hover:text-yellow-400">
-                        🔐 Inicia sessió
+                        🔑 Inicia Sessió
                     </a>
                     @endauth
                 </li>

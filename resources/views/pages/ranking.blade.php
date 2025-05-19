@@ -67,68 +67,64 @@
         });
 
     // Cargar ranking personal
-    function loadPersonalRanking() {
+    async function loadPersonalRanking() {
         const list = document.getElementById('personal-ranking-list');
         if (!list) return;
 
-        fetch('/api/personal-ranking')
-            .then(res => res.json())
-            .then(games => {
-                if (!games.length) {
-                    list.innerHTML = `<li class="text-center text-gray-500">Encara no hi ha valoracions personals. ⭐</li>`;
-                    return;
-                }
+        try {
+            const res = await fetch('/api/personal-ranking');
+            const games = await res.json();
 
-                list.innerHTML = games.map((game, index) => {
-                    const releaseDate = game.released ?
-                        new Date(game.released).toLocaleDateString('ca-ES') :
-                        "Per anunciar";
+            if (!games.length) {
+                list.innerHTML = `<li class="text-center text-gray-500">Encara no hi ha valoracions personals. ⭐</li>`;
+                return;
+            }
 
-                    const platforms = game.platform ? game.platform : "Desconegudes";
+            // Por cada juego local, pedimos datos a RAWG
+            const detailedGames = await Promise.all(games.map(async game => {
+                const rawgRes = await fetch(`https://api.rawg.io/api/games/${game.id}?key=${RAWG_API_KEY}`);
+                const rawgData = await rawgRes.json();
+                return {
+                    ...game,
+                    rawgData,
+                };
+            }));
 
-                    // Comprobar slug y fallback a id para URL
-                    const gameSlugOrId = game.slug ? game.slug : (game.id ? game.id : '');
+            list.innerHTML = detailedGames.map((game, index) => {
+                const g = game.rawgData;
+                const releaseDate = g.released ? new Date(g.released).toLocaleDateString('ca-ES') : "Per anunciar";
+                const platforms = g.platforms?.map(p => p.platform.name).join(", ") || "Desconegudes";
 
-                    return `
-    <li class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow 
-            p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-        <img src="${game.background_image}" 
-            alt="${game.name}" 
-            class="w-full sm:w-40 h-24 object-cover rounded-lg shadow-sm" />
-
-        <div class="flex-1">
-            <h3 class="text-2xl font-semibold mb-2 text-gray-800">
-                ${index + 1}. ${game.name}
-            </h3>
-            <div class="text-sm text-gray-600 space-y-1">
-                <p>🎮 <span class="font-medium">Plataformes:</span> ${platforms}</p>
-                <p>📅 <span class="font-medium">Llançament:</span> ${releaseDate}</p>
-                <p>⭐ <span class="font-medium">Valoració mitjana global:</span> 
-                    ${game.average_rating_global !== null 
-                        ? Number(game.average_rating_global).toFixed(2) + '/5' 
-                        : 'Sense valoració'}
-                </p>
-                <p>🙋 <span class="font-medium">La teva valoració:</span> 
-                    ${game.user_rating !== null 
-                        ? Number(game.user_rating).toFixed(2) + '/5' 
-                        : 'Sense valorar'}
-                </p>
-            </div>
-            <a href="https://rawg.io/games/${gameSlugOrId}" 
-                target="_blank" 
-                class="mt-3 inline-block text-blue-600 hover:underline font-medium text-sm">
-                🔗 Veure a RAWG
-            </a>
-        </div>
-    </li>
-    `;
-                }).join('');
-
-            })
-            .catch(error => {
-                console.error("Error carregant el rànquing personal:", error);
-                list.innerHTML = `<li class="text-center text-red-600 font-medium">Error carregant el rànquing. Torna-ho a intentar més tard.</li>`;
-            });
+                return `
+            <li class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow 
+                p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <img src="${g.background_image}" alt="${g.name}" 
+                     class="w-full sm:w-40 h-24 object-cover rounded-lg shadow-sm" />
+                <div class="flex-1">
+                    <h3 class="text-2xl font-semibold mb-2 text-gray-800">
+                        ${index + 1}. ${g.name}
+                    </h3>
+                    <div class="text-sm text-gray-600 space-y-1">
+                        <p>🎮 <span class="font-medium">Plataformes:</span> ${platforms}</p>
+                        <p>📅 <span class="font-medium">Llançament:</span> ${releaseDate}</p>
+                        <p>⭐ <span class="font-medium">Valoració mitjana global:</span> 
+                            ${game.average_rating_global !== null ? Number(game.average_rating_global).toFixed(2) + '/5' : 'Sense valoració'}
+                        </p>
+                        <p>🙋 <span class="font-medium">La teva valoració:</span> 
+                            ${game.user_rating !== null ? Number(game.user_rating).toFixed(2) + '/5' : 'Sense valorar'}
+                        </p>
+                    </div>
+                    <a href="https://rawg.io/games/${g.slug}" target="_blank" 
+                       class="mt-3 inline-block text-blue-600 hover:underline font-medium text-sm">
+                        🔗 Veure a RAWG
+                    </a>
+                </div>
+            </li>`;
+            }).join('');
+        } catch (error) {
+            console.error("Error carregant el rànquing personal:", error);
+            list.innerHTML = `<li class="text-center text-red-600 font-medium">Error carregant el rànquing. Torna-ho a intentar més tard.</li>`;
+        }
     }
 </script>
 
