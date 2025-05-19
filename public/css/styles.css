@@ -772,3 +772,32 @@ footer {
         height: auto;
     }
 }
+
+@media (max-width: 768px) {
+    .navbar-inner {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navbar-inner>a {
+        margin-bottom: 1rem;
+    }
+
+    .navbar-inner ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .navbar-inner ul li {
+        width: auto;
+    }
+
+    .navbar-inner ul li a,
+    .navbar-inner ul li button {
+        display: inline-block;
+        width: auto;
+        text-align: center;
+    }
+}
