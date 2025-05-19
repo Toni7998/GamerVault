@@ -64,6 +64,8 @@
                 <li><a href="{{ route('recomanacions') }}" class="nav-link text-lg hover:text-yellow-400">🔎 Recomanacions</a></li>
                 <li><a href="{{ route('ranking') }}" class="nav-link text-lg hover:text-yellow-400">🏆 Ranking</a></li>
                 <li><a href="{{ route('contacte') }}" class="nav-link text-lg hover:text-yellow-400">📩 Contacte</a></li>
+
+                @auth
                 <li>
                     <form method="POST" action="{{ route('logout') }}" class="inline-form">
                         @csrf
@@ -72,9 +74,19 @@
                         </button>
                     </form>
                 </li>
+                @endauth
+
+                @guest
+                <li>
+                    <a href="{{ route('login') }}" class="nav-link text-lg hover:text-green-400">
+                        🔑 Iniciar sessió
+                    </a>
+                </li>
+                @endguest
             </ul>
         </div>
     </nav>
+
 
     <main class="max-w-4xl mx-auto px-4 py-12 text-center fade-in">
         @yield('content') <!-- Este es el contenido específico de cada página -->
