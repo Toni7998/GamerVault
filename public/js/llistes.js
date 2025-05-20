@@ -620,7 +620,7 @@ function updateGameStatus(gameId, status) {
     console.log("Estat actual del joc guardat correctament:", status);
     Swal.fire({
         icon: 'success',
-        title: 'Estat guardat localment ✅',
+        title: 'Estat guardat correctament ✅',
         timer: 1500,
         showConfirmButton: false,
         background: '#1e1e1e',
@@ -637,10 +637,10 @@ function updateGameStatus(gameId, status) {
 function updateGameComment(gameId, comment) {
     localStorage.setItem(`game-comment-${gameId}`, comment);
 
-    console.log("Comentari guardat localment:", comment);
+    console.log("Comentari guardat correctament:", comment);
     Swal.fire({
         icon: 'success',
-        title: 'Comentari guardat localment ✅',
+        title: 'Comentari guardat correctament ✅',
         timer: 1500,
         showConfirmButton: false,
         background: '#1e1e1e',
