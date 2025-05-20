@@ -60,12 +60,12 @@
         <div class="features-grid">
             <div class="feature-card organize">
                 <h3 class="feature-title">📂 Organitza</h3>
-                <p class="feature-description">Crea i administra les teves pròpies llistes de videojocs fàcilment.</p>
+                <p class="feature-description">Administra la teva propia llista de videojocs fàcilment.</p>
             </div>
 
             <div class="feature-card share">
                 <h3 class="feature-title">🔗 Comparteix</h3>
-                <p class="feature-description">Ensenya als teus amics què estàs jugant o què recomanes.</p>
+                <p class="feature-description">Recomana videojocs als teus amics.</p>
             </div>
 
             <div class="feature-card discover">
@@ -108,17 +108,6 @@
         <br>
 
         <section class="mt-20 fade-in">
-            <h2 class="text-3xl font-bold mb-6 text-center">Recomanacions destacades</h2>
-            <div class="relative">
-                <div id="carousel-recomanacions" class="carousel-track">
-                    <!-- Recomanacions es carregaran aquí -->
-                </div>
-            </div>
-        </section>
-
-        <br>
-
-        <section class="mt-20 fade-in">
             <h2 class="text-3xl font-bold mb-6 text-center">Top del ranking</h2>
             <div class="relative">
                 <div id="carousel-ranking" class="carousel-track">
@@ -157,33 +146,6 @@
 
 <script>
     const RAWG_API_KEY = "a6932e9255e64cf98bfa75abde510c5d";
-
-    // Recomanacions
-    fetch("/api/recommendations")
-        .then(res => res.json())
-        .then(recs => {
-            const container = document.getElementById("carousel-recomanacions");
-            recs.slice(0, 3).forEach(rec => {
-                fetch(`https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(rec.game)}&page_size=1`)
-                    .then(res => res.json())
-                    .then(data => {
-                        const game = data.results?.[0];
-                        if (!game || !game.background_image) return;
-
-                        const card = document.createElement("div");
-                        card.className = "carousel-card";
-                        card.innerHTML = `
-                            <img src="${game.background_image}" alt="${game.name}">
-                            <div class="p-4">
-                                <h3 class="font-bold text-lg mb-2">${game.name}</h3>
-                                <p class="text-sm text-gray-600">👤 ${rec.sender}</p>
-                                <a href="https://rawg.io/games/${game.slug}" target="_blank" class="text-blue-600 text-sm hover:underline">🔗 RAWG</a>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-            });
-        });
 
     // Ranking
     fetch("/api/ranking")
