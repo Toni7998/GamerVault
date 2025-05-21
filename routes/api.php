@@ -6,6 +6,8 @@ use App\Http\Controllers\FriendController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Api\PersonalRankingController;
+use App\Http\Controllers\RecommendationController;
 
 Route::get('/lists', function () {
     return response()->json([
@@ -30,7 +32,6 @@ Route::middleware('auth')->get('/friends', [FriendController::class, 'index']);
 
 Route::get('/search-games', [GameSearchController::class, 'search']);
 
-use App\Http\Controllers\Api\PersonalRankingController;
 
 Route::get('personal-ranking', [PersonalRankingController::class, 'index']);
 
@@ -64,7 +65,6 @@ Route::post('/api/recommendations/send', function (Request $request) {
     return response()->json(['message' => 'Recomendación enviada']);
 });
 
-use App\Http\Controllers\RecommendationController;
 
 Route::middleware('auth:sanctum')->post('/recommend-game', [RecommendationController::class, 'recommend']);
 
