@@ -504,7 +504,7 @@ async function addGameToList(game, recommendationCard) {
 
     try {
         // PAS 1: Obtenir dades extres del joc des de RAWG
-        const rawgResponse = await fetch(`/api/rawg/details/${game.id}`);
+        const rawgResponse = await fetch(`/rawg/details/${game.id}`);
         if (!rawgResponse.ok) {
             throw new Error("No s'han pogut obtenir detalls del joc des de RAWG.");
         }
