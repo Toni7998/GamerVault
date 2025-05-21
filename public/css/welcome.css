@@ -259,15 +259,13 @@ button {
 /* Carousels de la página principal*/
 .carousel-track {
     display: flex;
-    gap: 1.5rem;
-    padding: 1rem;
+    justify-content: center; /* 💡 Centrado horizontal */
+    gap: 1rem;
     overflow-x: auto;
     scroll-behavior: smooth;
+    padding-bottom: 1rem;
     scroll-snap-type: x mandatory;
-}
-
-.carousel-track::-webkit-scrollbar {
-    display: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 .carousel-card {
@@ -278,9 +276,14 @@ button {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     color: #eaeaea;
-    scroll-snap-align: start;
+    scroll-snap-align: center; /* 💡 Centra la tarjeta al hacer scroll */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
 
 .carousel-card:hover {
     transform: scale(1.05);
@@ -533,15 +536,20 @@ textarea:focus {
 
 /* Tarjetas de post */
 .posts>div {
+    background-color: #2b2b2b;
     border-left: 4px solid #7e22ce;
-    /* acento visual */
+    /* acento morado */
     padding-left: 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 0.4rem;
+    box-shadow: 0 1px 3px rgba(126, 34, 206, 0.2);
     position: relative;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .posts>div:hover {
-    background-color: #333333;
+    background-color: #3a3a3a;
+    box-shadow: 0 4px 8px rgba(126, 34, 206, 0.4);
 }
 
 /* Nombre y fecha */
@@ -549,7 +557,9 @@ textarea:focus {
     font-size: 0.8rem;
     color: #aaa;
     margin-bottom: 0.3rem;
+    font-style: italic;
 }
+
 
 /* Botón enviar */
 .post-form button {
@@ -569,6 +579,70 @@ textarea:focus {
     border-top: 1px solid #333;
     padding-top: 1rem;
     margin-top: 2rem;
+}
+
+/* --- Controles de paginación --- */
+div[id^="pagination-controls-"] {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.2rem;
+    user-select: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+div[id^="pagination-controls-"] button {
+    background: linear-gradient(135deg, #7e22ce, #a855f7);
+    border: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 2px 6px rgba(126, 34, 206, 0.6);
+    transition: none;
+    /* sin transición para no iluminar */
+}
+
+div[id^="pagination-controls-"] button:hover:not(:disabled) {
+    /* Quitar efectos hover para evitar iluminación */
+    background: linear-gradient(135deg, #7e22ce, #a855f7);
+    transform: none;
+}
+
+div[id^="pagination-controls-"] button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+div[id^="pagination-controls-"] span {
+    align-self: center;
+    color: #bdbdbd;
+}
+
+/* --- Scroll interno para posts (opcional) --- */
+#posts-thread-1,
+#posts-thread-2,
+#posts-thread-3 {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Scroll personalizado para webkit */
+#posts-thread-1::-webkit-scrollbar,
+#posts-thread-2::-webkit-scrollbar,
+#posts-thread-3::-webkit-scrollbar {
+    width: 8px;
+}
+
+#posts-thread-1::-webkit-scrollbar-thumb,
+#posts-thread-2::-webkit-scrollbar-thumb,
+#posts-thread-3::-webkit-scrollbar-thumb {
+    background: #7e22ce;
+    border-radius: 4px;
 }
 
 /* Text d'avís login */
@@ -647,29 +721,33 @@ textarea:focus {
 
 /* Por defecto: logo y nav en fila */
 .navbar-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Responsive: a partir de 768px y abajo */
 @media (max-width: 768px) {
-  .navbar-inner {
-    flex-direction: column;
-    align-items: flex-start; /* Logo y nav alineados a la izquierda */
-    gap: 0.75rem; /* Separación vertical entre logo y nav */
-  }
+    .navbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        /* Logo y nav alineados a la izquierda */
+        gap: 0.75rem;
+        /* Separación vertical entre logo y nav */
+    }
 
-  /* Para que la lista de links ocupe todo el ancho disponible */
-  .navbar-links {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap; /* Para que los links puedan ir a más líneas si no caben */
-    gap: 1rem;
-  }
+    /* Para que la lista de links ocupe todo el ancho disponible */
+    .navbar-links {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        /* Para que los links puedan ir a más líneas si no caben */
+        gap: 1rem;
+    }
 
-  /* Opcional: que el logo no sea tan grande y se ajuste bien */
-  .navbar-inner a img {
-    height: 8rem; /* O cualquier tamaño que quieras para móvil */
-  }
+    /* Opcional: que el logo no sea tan grande y se ajuste bien */
+    .navbar-inner a img {
+        height: 8rem;
+        /* O cualquier tamaño que quieras para móvil */
+    }
 }

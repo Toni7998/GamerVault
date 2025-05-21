@@ -74,6 +74,21 @@
             </div>
         </div>
 
+        <br> 
+
+        <section class="mt-20 fade-in">
+            <h2 class="text-3xl font-bold mb-6 text-center">🏆 Top del Ranking</h2>
+            <div class="flex justify-center">
+                <div class="relative w-full max-w-5xl px-4">
+                    <div id="carousel-ranking" class="carousel-track justify-center">
+                        <!-- Ranking es carregarà aquí -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <br>
+
         <div class="max-w-4xl mx-auto">
             <h1 class="text-3xl font-bold mb-4">💬 Fòrum GamerVault</h1>
 
@@ -106,15 +121,6 @@
         </div>
 
         <br>
-
-        <section class="mt-20 fade-in">
-            <h2 class="text-3xl font-bold mb-6 text-center">Top del ranking</h2>
-            <div class="relative">
-                <div id="carousel-ranking" class="carousel-track">
-                    <!-- Ranking es carregarà aquí -->
-                </div>
-            </div>
-        </section>
 
         <section id="contacte" class="fade-in" style="margin-top: 5rem; text-align: center;">
             <h2 class="text-3xl font-bold mb-4">📩 Contacta amb nosaltres</h2>
