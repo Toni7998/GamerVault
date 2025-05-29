@@ -37,8 +37,12 @@
                         <div class="flex-1">
                             <h3 class="text-2xl font-semibold mb-2 text-gray-800">
                                 ${game.name} 
-                                <span class="text-sm text-gray-500">— Recomanat per ${rec.sender}</span>
                             </h3>
+
+                            <h3> <span class="ml-auto text-xs bg-purple-600 text-white px-3 py-1 rounded-full shadow-sm font-medium">
+                            👤 Recomanat per ${rec.sender}
+                            </span> </h3>
+
                             <div class="text-sm text-gray-600 space-y-1">
                                 <p>🎮 <span class="font-medium">Plataformes:</span> ${platforms}</p>
                                 <p>📅 <span class="font-medium">Data de llançament:</span> ${releaseDate}</p>
