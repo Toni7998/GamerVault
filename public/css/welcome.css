@@ -193,17 +193,10 @@ button {
     border-radius: 15px;
     padding: 1.5rem;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    transition: all 0.3s ease;
     text-align: center;
     transform: translateY(0);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Efectos de Hover */
-.feature-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
 }
 
 /* Títulos de las características */
@@ -239,28 +232,11 @@ button {
     border-left: 8px solid #f8b300;
 }
 
-/* Animación fade-in para cada elemento */
-.fade-in {
-    animation: fadeIn 1.5s ease-out forwards;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 /* Carousels de la página principal*/
 .carousel-track {
     display: flex;
     justify-content: center; /* 💡 Centrado horizontal */
-    gap: 1rem;
+    gap: 2rem;
     overflow-x: auto;
     scroll-behavior: smooth;
     padding-bottom: 1rem;
@@ -284,9 +260,8 @@ button {
     display: none;
 }
 
-
 .carousel-card:hover {
-    transform: scale(1.05);
+    transform: scale(1.01);
     box-shadow: 0 8px 24px rgba(167, 139, 250, 0.35);
 }
 
