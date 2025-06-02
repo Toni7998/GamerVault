@@ -4,6 +4,8 @@
 <div class="container mx-auto px-4 py-8">
     <h2 class="text-4xl font-bold mt-4 mb-4 text-center text-gray-800">🎯 Recomanacions del dia</h2>
     <ul id="recommendations-list" class="space-y-6"></ul>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </div>
 
 <script>
@@ -29,33 +31,45 @@
                 const rating = game.rating ?? "Sense valoració";
 
                 return `
-                    <li class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow 
-                               p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center animate-fade-in">
-                        <img src="${game.background_image}" 
-                             alt="${game.name}" 
-                             class="w-full sm:w-40 h-24 object-cover rounded-lg shadow-sm" />
-                        <div class="flex-1">
-                            <h3 class="text-2xl font-semibold mb-2 text-gray-800">
-                                ${game.name} 
-                            </h3>
+    <li id="rec-${rec.id}" class="list-card bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow 
+                                  p-5 flex flex-col sm:flex-row gap-6 items-start sm:items-center animate-fade-in">
 
-                            <h3> <span class="ml-auto text-xs bg-purple-600 text-white px-3 py-1 rounded-full shadow-sm font-medium">
-                            👤 Recomanat per ${rec.sender}
-                            </span> </h3>
+        <img src="${game.background_image}" 
+             alt="${game.name}" 
+             class="w-full sm:w-64 h-40 object-cover rounded-xl shadow-sm" />
 
-                            <div class="text-sm text-gray-600 space-y-1">
-                                <p>🎮 <span class="font-medium">Plataformes:</span> ${platforms}</p>
-                                <p>📅 <span class="font-medium">Data de llançament:</span> ${releaseDate}</p>
-                                <p>⭐ <span class="font-medium">Valoració RAWG:</span> ${rating}</p>
-                            </div>
-                            <a href="https://rawg.io/games/${game.slug}" 
-                               target="_blank" 
-                               class="mt-3 inline-block text-blue-600 hover:underline font-medium text-sm">
-                                🔗 Veure a RAWG
-                            </a>
-                        </div>
-                    </li>
-                `;
+        <div class="flex-1 space-y-4 text-gray-700">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <h3 class="text-2xl font-bold text-gray-800">${game.name}</h3>
+                <span class="text-xs bg-purple-600 text-white px-3 py-1 rounded-full shadow-sm font-medium">
+                    👤 Recomanat per ${rec.sender}
+                </span>
+            </div>
+
+            <ul class="text-sm space-y-1">
+                <li>🎮 <span class="font-medium">Plataformes:</span> ${platforms}</li>
+                <li>📅 <span class="font-medium">Data de llançament:</span> ${releaseDate}</li>
+                <li>⭐ <span class="font-medium">Valoració RAWG:</span> ${rating}</li>
+            </ul>
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-3 border-t border-gray-200 mt-4 pt-4">
+                <a href="https://rawg.io/games/${game.slug || ''}" 
+                   target="_blank" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition font-medium text-center">
+                    🔗 Veure a RAWG
+                </a>
+
+                <br><br>
+
+                <button 
+                    class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition font-medium"
+                    data-recommendation-id="${rec.id}"
+                    onclick='addGameToList(${JSON.stringify(game)}, document.getElementById("rec-${rec.id}"))'>
+                    ➕ Afegir a la teva llista
+                </button>
+            </div>
+        </div>
+    </li>`;
             }));
 
             ul.innerHTML = listItems.filter(Boolean).join('');
@@ -64,5 +78,126 @@
             console.error("Error carregant recomanacions:", error);
             ul.innerHTML = `<li class="text-red-500 text-center">No s'han pogut carregar les recomanacions. Torna-ho a provar més tard.</li>`;
         });
+
+        /**
+         * Funció per afegir els videojocs a la llista
+         */
+    async function addGameToList(game, recommendationCard) {
+    
+        if (localStorage.getItem(`game-name-${game.id}`)) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Ja està afegit',
+            text: `"${game.name}" ja ha format part de la teva llista.`,
+            background: '#1e1e1e',
+            color: '#f0f0f0'
+        });
+        return;
+    }
+
+        const result = await Swal.fire({
+            title: 'Afegir joc a la llista?',
+            text: `Vols afegir "${game.name}" a la teva llista?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, afegeix-lo!',
+            cancelButtonText: 'Cancel·la',
+            background: '#1e1e1e',
+            color: '#f0f0f0',
+            confirmButtonColor: '#4caf50',
+            cancelButtonColor: '#f44336'
+        });
+
+        if (!result.isConfirmed) return;
+
+        Swal.fire({
+            title: 'Afegint joc...',
+            html: 'Espera mentre es comprova la informació i s’afegeix el joc.',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+            background: '#1e1e1e',
+            color: '#f0f0f0'
+        });
+
+        try {
+            const rawgResponse = await fetch(`/rawg/details/${game.id}`);
+            if (!rawgResponse.ok) {
+                throw new Error("No s'han pogut obtenir detalls del joc des de RAWG.");
+            }
+            const detailedGame = await rawgResponse.json();
+
+            const postResponse = await fetch('/game-list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: detailedGame.id, // <--- Aquí está el cambio
+                    title: detailedGame.name,
+                    background_image: detailedGame.background_image || 'https://placehold.co/150x150?text=Sense+imatge',
+                    released: detailedGame.released,
+                    platform: detailedGame.platforms?.[0]?.platform?.name || null
+                })
+            });
+
+            if (!postResponse.ok) {
+                const text = await postResponse.text();
+                if (text.startsWith("<!DOCTYPE")) {
+                    throw new Error("Error: S'ha rebut una pàgina HTML en lloc de JSON.");
+                }
+                throw new Error("Error al afegir el joc: " + text);
+            }
+
+            const data = await postResponse.json();
+
+            if (recommendationCard) {
+                const recommendationId = recommendationCard.id.replace('rec-', '');
+                await fetch(`/api/recommendations/${recommendationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                recommendationCard.remove();
+
+                const remainingCards = document.querySelectorAll('.list-card');
+                if (remainingCards.length === 0) {
+                    ul.innerHTML = `
+                        <div class="list-card text-center py-8 text-white">
+                            <p class="text-lg mb-2">🎉 Ja no tens recomanacions pendents</p>
+                            <p class="text-sm text-gray-400">El joc s'ha afegit correctament a la teva llista</p>
+                        </div>
+                    `;
+                }
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Afegit!',
+                text: `El joc "${detailedGame.name}" ha estat afegit a la teva llista!`,
+                timer: 2000,
+                showConfirmButton: false,
+                background: '#1e1e1e',
+                color: '#f0f0f0'
+            });
+
+            localStorage.setItem(`game-name-${game.id}`, game.name);
+            localStorage.setItem(`game-image-${game.id}`, game.background_image || 'https://placehold.co/150x150?text=Sense+imatge');
+            localStorage.setItem(`game-platforms-${game.id}`, game.platforms?.map(p => p.platform.name).join(', ') || '');
+            localStorage.setItem(`game-released-${game.id}`, game.released || '');
+
+        } catch (err) {
+            console.error("Error afegint joc:", err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'Hi ha hagut un problema afegint el joc.',
+                background: '#1e1e1e',
+                color: '#f0f0f0'
+            });
+        }
+    }
 </script>
 @endsection

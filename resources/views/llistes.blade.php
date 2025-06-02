@@ -5,7 +5,6 @@
     <section class="dashboard-header mb-6">
         <h2 class="text-3xl font-semibold text-gray-800">📂 La meva llista</h2>
         <p class="text-gray-600 mt-2">Aquesta és la teva única llista personal de videojocs. 🎮</p>
-        <!-- En tu HTML (head o antes del cierre del body) -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
