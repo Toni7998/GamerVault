@@ -1,41 +1,45 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div id="recommendations-container" class="container mx-auto px-4 py-8">
     <h2 class="text-4xl font-bold mt-4 mb-4 text-center text-gray-800">🎯 Recomanacions del dia</h2>
     <ul id="recommendations-list" class="space-y-6"></ul>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </div>
 
+<!-- JS I SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
 <script>
-    const RAWG_API_KEY = "a6932e9255e64cf98bfa75abde510c5d";
-    const currentDay = new Date().getDay();
-    const ul = document.getElementById("recommendations-list");
+    document.addEventListener('DOMContentLoaded', function() {
 
-    fetch(`/api/recommendations?day=${currentDay}`)
-        .then(res => res.json())
-        .then(async recommendations => {
-            const listItems = await Promise.all(recommendations.map(async rec => {
-                const res = await fetch(`https://api.rawg.io/api/games?key=${RAWG_API_KEY}&page_size=1&search=${encodeURIComponent(rec.game)}`);
-                const gameData = await res.json();
-                const game = gameData.results?.[0];
+        const RAWG_API_KEY = "a6932e9255e64cf98bfa75abde510c5d";
+        const currentDay = new Date().getDay();
+        const ul = document.getElementById("recommendations-list");
 
-                if (!game?.background_image) return null;
+        fetch(`/api/recommendations?day=${currentDay}`)
+            .then(res => res.json())
+            .then(async recommendations => {
+                const listItems = await Promise.all(recommendations.map(async rec => {
+                    const res = await fetch(`https://api.rawg.io/api/games?key=${RAWG_API_KEY}&page_size=1&search=${encodeURIComponent(rec.game)}`);
+                    const gameData = await res.json();
+                    const game = gameData.results?.[0];
 
-                const releaseDate = game.released ?
-                    new Date(game.released).toLocaleDateString('ca-ES') :
-                    "Desconeguda";
+                    if (!game?.background_image) return null;
 
-                const platforms = game.platforms?.map(p => p.platform.name).join(", ") || "Desconegudes";
-                const rating = game.rating ?? "Sense valoració";
+                    const releaseDate = game.released ?
+                        new Date(game.released).toLocaleDateString('ca-ES') :
+                        "Desconeguda";
 
-                return `
-    <li id="rec-${rec.id}" class="list-card bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow 
+                    const platforms = game.platforms?.map(p => p.platform.name).join(", ") || "Desconegudes";
+                    const rating = game.rating ?? "Sense valoració";
+
+                    return `
+    <li id="rec-${rec.id}" class="list-card bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow
                                   p-5 flex flex-col sm:flex-row gap-6 items-start sm:items-center animate-fade-in">
 
-        <img src="${game.background_image}" 
-             alt="${game.name}" 
+        <img src="${game.background_image}"
+             alt="${game.name}"
              class="w-full sm:w-64 h-40 object-cover rounded-xl shadow-sm" />
 
         <div class="flex-1 space-y-4 text-gray-700">
@@ -53,48 +57,40 @@
             </ul>
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-3 border-t border-gray-200 mt-4 pt-4">
-                <a href="https://rawg.io/games/${game.slug || ''}" 
-                   target="_blank" 
+                <a href="https://rawg.io/games/${game.slug || ''}"
+                   target="_blank"
                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition font-medium text-center">
                     🔗 Veure a RAWG
                 </a>
 
                 <br><br>
 
-                <button 
-                    class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition font-medium"
-                    data-recommendation-id="${rec.id}"
-                    onclick='addGameToList(${JSON.stringify(game)}, document.getElementById("rec-${rec.id}"))'>
-                    ➕ Afegir a la teva llista
-                </button>
+                <button
+    class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition font-medium"
+    data-recommendation-id="${rec.id}"
+    onclick='addGameToList(${JSON.stringify(game)}, document.getElementById("rec-${rec.id}"), ${rec.id})'>
+    ➕ Afegir a la teva llista
+</button>
+
             </div>
         </div>
     </li>`;
-            }));
+                }));
 
-            ul.innerHTML = listItems.filter(Boolean).join('');
-        })
-        .catch(error => {
-            console.error("Error carregant recomanacions:", error);
-            ul.innerHTML = `<li class="text-red-500 text-center">No s'han pogut carregar les recomanacions. Torna-ho a provar més tard.</li>`;
-        });
+                ul.innerHTML = listItems.filter(Boolean).join('');
+            })
+            .catch(error => {
+                console.error("Error carregant recomanacions:", error);
+                ul.innerHTML = `<li class="text-red-500 text-center">No s'han pogut carregar les recomanacions. Torna-ho a provar més tard.</li>`;
+            });
+    });
 
-        /**
-         * Funció per afegir els videojocs a la llista
-         */
-    async function addGameToList(game, recommendationCard) {
-    
-        if (localStorage.getItem(`game-name-${game.id}`)) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Ja està afegit',
-            text: `"${game.name}" ja ha format part de la teva llista.`,
-            background: '#1e1e1e',
-            color: '#f0f0f0'
-        });
-        return;
-    }
-
+    /**
+     * Función para agregar juegos a la lista y eliminar la recomendación
+     * @param {*} game 
+     * @param {HTMLElement} [recommendationCard] - Elemento de la tarjeta de recomendación a eliminar
+     */
+    async function addGameToList(game, recommendationCard, recommendationId) {
         const result = await Swal.fire({
             title: 'Afegir joc a la llista?',
             text: `Vols afegir "${game.name}" a la teva llista?`,
@@ -110,22 +106,27 @@
 
         if (!result.isConfirmed) return;
 
+        // Pantalla de càrrega
         Swal.fire({
             title: 'Afegint joc...',
             html: 'Espera mentre es comprova la informació i s’afegeix el joc.',
             allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
+            didOpen: () => {
+                Swal.showLoading();
+            },
             background: '#1e1e1e',
             color: '#f0f0f0'
         });
 
         try {
+            // PAS 1: Obtenir dades extres del joc des de RAWG
             const rawgResponse = await fetch(`/rawg/details/${game.id}`);
             if (!rawgResponse.ok) {
                 throw new Error("No s'han pogut obtenir detalls del joc des de RAWG.");
             }
             const detailedGame = await rawgResponse.json();
 
+            // PAS 2: Enviar a la teva BD
             const postResponse = await fetch('/game-list', {
                 method: 'POST',
                 headers: {
@@ -134,7 +135,7 @@
                     'Accept': 'application/json',
                 },
                 body: JSON.stringify({
-                    id: detailedGame.id, // <--- Aquí está el cambio
+                    id: detailedGame.id,
                     title: detailedGame.name,
                     background_image: detailedGame.background_image || 'https://placehold.co/150x150?text=Sense+imatge',
                     released: detailedGame.released,
@@ -152,27 +153,6 @@
 
             const data = await postResponse.json();
 
-            if (recommendationCard) {
-                const recommendationId = recommendationCard.id.replace('rec-', '');
-                await fetch(`/api/recommendations/${recommendationId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                });
-                recommendationCard.remove();
-
-                const remainingCards = document.querySelectorAll('.list-card');
-                if (remainingCards.length === 0) {
-                    ul.innerHTML = `
-                        <div class="list-card text-center py-8 text-white">
-                            <p class="text-lg mb-2">🎉 Ja no tens recomanacions pendents</p>
-                            <p class="text-sm text-gray-400">El joc s'ha afegit correctament a la teva llista</p>
-                        </div>
-                    `;
-                }
-            }
-
             Swal.fire({
                 icon: 'success',
                 title: 'Afegit!',
@@ -183,6 +163,7 @@
                 color: '#f0f0f0'
             });
 
+            // Guarda info bàsica localment
             localStorage.setItem(`game-name-${game.id}`, game.name);
             localStorage.setItem(`game-image-${game.id}`, game.background_image || 'https://placehold.co/150x150?text=Sense+imatge');
             localStorage.setItem(`game-platforms-${game.id}`, game.platforms?.map(p => p.platform.name).join(', ') || '');
